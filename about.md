@@ -4,6 +4,8 @@ title: 关于
 permalink: /about/
 ---
 
+弱水三千，只取一瓢饮
+
 1. [Rails Cookbook](/2015/03/07/my-rails-cookbook.html)
 2. [Ruby Cookbook](/2015/02/26/my-ruby-cookbook.html)
 3. [Postgresql Cookbook](/2015/04/02/我的Postgresql-Cookbook.html)
