@@ -135,6 +135,6 @@ mongod -f /path/to/mongodb.conf
 测试上传图片:
 
 ~~~bash
-mongofiles put --host localhost --port 27017 --db imgdb --local ~/my_img.jpg --type jpg
+mongofiles --host localhost --port 27017 --db imgdb put ~/my_img.jpg
 ~~~
 
