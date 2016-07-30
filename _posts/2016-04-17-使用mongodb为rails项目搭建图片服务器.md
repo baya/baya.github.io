@@ -102,7 +102,35 @@ http {
 
 ~~~
 
+
 这样我们就完成了 nginx-gridfs 的配置。
+
+这里要注意 `/data/nginx_cache/nginx_temp` 的访问权限问题，如果 nginx 的 error log 中出现类似 `failed (13: Permission denied) while reading upstream` 的错误，可以使用
+`chown` 命令将 `/data/nginx_cache/nginx_temp` 的 owner 修改下。
+
+我们分析下 `4444` 端口也就是和 Mongo GridFS 交互的配置的细节:
+
+~~~bash
+    server{
+        listen       4444;
+        location / {
+                        gridfs imgdb root_collection=fs field=filename type=string;
+                        mongo 127.0.0.1:27017;
+          }
+    }
+~~~
+
+
+* gridfs：         nginx识别插件的名字;
+* pics：           数据库名称;
+* root_collection: 选择collection，如root_collection=images， mongod就会去找images.files，默认是fs;
+* field：          查询字段，支持_id, filename, 可省略, 默认是_id, 在这里我们使用 filename 即图片的名字去查找图片;
+* type：           解释field的数据类型，支持objectid, int, string, 可省略, 默认是int, 如果我们 field 用的是 filename, 那么此处需要设置为 string;
+* user:           用户名, 可省略;
+* pass:           密码, 可省略;
+* mongo：          mongodb 的 host 和 port;
+
+
 
 ## 2 启动 nginx 和 mongodb, 并测试是否能够正常存取图片
 
@@ -135,6 +163,18 @@ mongod -f /path/to/mongodb.conf
 测试上传图片:
 
 ~~~bash
-mongofiles --host localhost --port 27017 --db imgdb put ~/my_img.jpg
+mongofiles --host localhost --port 27017 --db imgdb --local=/path/to/dog.jpg put my_dog.jpg
 ~~~
+
+通过浏览器可以访问已经上传的图片:
+
+![my_img.jpg](/images/Snip20160730_22.png)
+
+## 3 与 Rails 项目集成
+
+
+## 参考
+
+* [GridFS: https://docs.mongodb.com/manual/core/gridfs/](https://docs.mongodb.com/manual/core/gridfs/)
+* [mdirolf/nginx-gridfs: https://github.com/mdirolf/nginx-gridfs](https://github.com/mdirolf/nginx-gridfs)
 
