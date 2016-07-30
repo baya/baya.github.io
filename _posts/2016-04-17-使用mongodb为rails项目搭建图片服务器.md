@@ -172,9 +172,30 @@ mongofiles --host localhost --port 27017 --db imgdb --local=/path/to/dog.jpg put
 
 ## 3 与 Rails 项目集成
 
+demo 项目里的 Gemfile 中有三个比较关键的 gem:
+
+```
+gem 'carrierwave'
+gem 'carrierwave-mongoid'
+gem 'mongoid'
+```
+
+* `carrierwave` 是 ruby 社区中一个优秀的图片管理包.
+* `carrierwave-mongoid` 使我们能够在 `carrierwave` 中使用 `mongoid`.
+* `mongoid` 是 ruby 社区中的一个优秀的 MongoDB ORM.
+
+`carrierwave` 的核心概念是 `Uploader`, 通过创建 `Uploader` 来实现对文件的管理。比如我们生成
+`AvatarUploader` 来管理 avatar,
+
+```bash
+$ bin/rails generate uploader Avatar
+```
+
 
 ## 参考
 
 * [GridFS: https://docs.mongodb.com/manual/core/gridfs/](https://docs.mongodb.com/manual/core/gridfs/)
 * [mdirolf/nginx-gridfs: https://github.com/mdirolf/nginx-gridfs](https://github.com/mdirolf/nginx-gridfs)
+* [carrierwave: https://github.com/carrierwaveuploader/carrierwave](https://github.com/carrierwaveuploader/carrierwave)
+* [carrierwave-mongoid: https://github.com/carrierwaveuploader/carrierwave-mongoid](https://github.com/carrierwaveuploader/carrierwave-mongoid)
 
