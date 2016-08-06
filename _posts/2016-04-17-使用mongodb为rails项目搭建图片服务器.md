@@ -122,7 +122,7 @@ http {
 
 
 * gridfs：         nginx识别插件的名字;
-* pics：           数据库名称;
+* imgdb：          数据库名称;
 * root_collection: 选择collection，如root_collection=images， mongod就会去找images.files，默认是fs;
 * field：          查询字段，支持_id, filename, 可省略, 默认是_id, 在这里我们使用 filename 即图片的名字去查找图片;
 * type：           解释field的数据类型，支持objectid, int, string, 可省略, 默认是int, 如果我们 field 用的是 filename, 那么此处需要设置为 string;
@@ -172,30 +172,60 @@ mongofiles --host localhost --port 27017 --db imgdb --local=/path/to/dog.jpg put
 
 ## 3 与 Rails 项目集成
 
-demo 项目里的 Gemfile 中有三个比较关键的 gem:
+### 3.1 demo 项目简介
+
+在写这个 demo 时，我原本打算参照我所在公司的项目的代码来完成图片上传的功能，但是由于公司使用的 rails 版本比较低，相关配套的 gem 在适配比较新的 rails 版本(这个 demo 用的 rails 版本是 4.2.6)时出现了很多问题, 并且相关的配置过于繁琐复杂，我决定只使用 mongodb 的官方 ruby driver 来实现图片上传的功能。
+
+公司项目中为了实现图片上传使用了如下的 gem:
 
 ```
+# Gemfile
 gem 'carrierwave'
 gem 'carrierwave-mongoid'
 gem 'mongoid'
 ```
 
-* `carrierwave` 是 ruby 社区中一个优秀的图片管理包.
-* `carrierwave-mongoid` 使我们能够在 `carrierwave` 中使用 `mongoid`.
-* `mongoid` 是 ruby 社区中的一个优秀的 MongoDB ORM.
+只使用 mongodb 的官方 ruby driver: mongo,
 
-`carrierwave` 的核心概念是 `Uploader`, 通过创建 `Uploader` 来实现对文件的管理。比如我们生成
-`AvatarUploader` 来管理 avatar,
-
-```bash
-$ bin/rails generate uploader Avatar
 ```
+# Gemfile
+gem 'mongo', '~> 2.2'
+```
+
+在此 demo 中, 图片上传的业务流程可以简单到用一句话说清楚:
+
+> 应用为图片生成唯一的名称，然后将图片提交给图片服务器，如果图片服务器保存图片成功，则将图片名称存储到
+数据库以供应用将来从图片服务器拿图片。
+
+### 3.2 demo 设计
+
+当然在实际的应用中还涉及到图片的压缩，裁减，变换，加水印等业务逻辑, 但是这些业务逻辑应该是和图片上传隔离的不应该耦合在一起，从这种角度考虑，我比较讨厌 `carrierwave` 之类的图片上传库把图片的上传，裁减，变换等工作都放到一个 Uploader 里去实现。
+
+作为一名程序员，将自己的想法转化成直观的图形有两点好处:
+
+1. 方便自己写代码
+
+2. 方便别人写代码
+
+所以我们仍然对图片上传这一看似简单的功能画一张图:
+
+![app-client-server](/images/Snip20160806_25.png)
+
+从上面的图中我们可以分4个步骤实现图片上传的功能:
+
+1. 应用方面，我们需要生成 image params, 比如 image name, image 实体等参数提交给图片服务器客户端;
+
+2. 图片服务器客户端方面, 我们需要写服务器的配置信息, 并连接服务器;
+
+3. 图片服务器客户端方面, 我们需要将图片参数提交给服务器；
+
+4. 应用方面, 我们需要处理图片服务器的响应, 如果响应成功我们需要将图片的名称等参数记录下来;
+
+### 3.3 demo 实现
 
 
 ## 参考
 
-* [GridFS: https://docs.mongodb.com/manual/core/gridfs/](https://docs.mongodb.com/manual/core/gridfs/)
-* [mdirolf/nginx-gridfs: https://github.com/mdirolf/nginx-gridfs](https://github.com/mdirolf/nginx-gridfs)
-* [carrierwave: https://github.com/carrierwaveuploader/carrierwave](https://github.com/carrierwaveuploader/carrierwave)
-* [carrierwave-mongoid: https://github.com/carrierwaveuploader/carrierwave-mongoid](https://github.com/carrierwaveuploader/carrierwave-mongoid)
+* [Mongodb GridFS图片文件存储解决方案: http://chwshuang.iteye.com/blog/2065974](http://chwshuang.iteye.com/blog/2065974)
 
+* [Mongo Ruby Driver: https://github.com/mongodb/mongo-ruby-driver](https://github.com/mongodb/mongo-ruby-driver)
