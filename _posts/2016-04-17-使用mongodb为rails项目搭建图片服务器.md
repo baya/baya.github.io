@@ -211,7 +211,7 @@ gem 'mongo', '~> 2.2'
 
 ![app-client-server](/images/Snip20160806_25.png)
 
-从上面的图中我们可以分4个步骤实现图片上传的功能:
+通过分析上面的图, 我们可以分4个步骤实现图片上传的功能:
 
 1. 应用方面，我们需要生成 image params, 比如 image name, image 实体等参数提交给图片服务器客户端;
 
@@ -223,6 +223,110 @@ gem 'mongo', '~> 2.2'
 
 ### 3.3 demo 实现
 
+#### 3.3.1 图片服务器客户端的配置和初始化
+
+先写配置文件:
+
+~~~yaml
+# config/mongo.yml
+
+development:
+  host: localhost
+  port: 27017
+  database: imgdb
+  
+test:
+  host: localhost
+  port: 27017
+  database: imgdb
+  
+staging:
+  host: localhost
+  port: 27017
+  database: imgdb
+  
+production:
+  host: localhost
+  port: 27017
+  database: imgdb  
+~~~
+
+初始化客户端:
+
+~~~ruby
+# config/initializers/mongo.rb
+
+mc = YAML.load_file(Rails.root.join('config', 'mongo.yml'))[Rails.env]
+db_url = "mongodb://#{mc['host']}/#{mc['database']}"
+$mongo = Mongo::Client.new(db_url)
+~~~
+
+这样我们就拥有了一个可以全局访问的客户端: `$mongo`
+
+#### 3.3.2 编写图片上传服务
+
+图片上传的服务逻辑非常简单: 接受一个 `file` 参数, 返回 `filename` 和 `content_type`
+
+~~~ruby
+# app/services/upload_file_service.rb
+
+class UploadFileService
+
+  def initialize(file)
+    @file = file
+  end
+
+  def call
+    grid = $mongo.database.fs
+    grid.upload_from_stream(filename, @file)
+    res = {
+      filename: filename,
+      content_type: @file.content_type
+    }
+  end
+
+  private
+
+  def filename
+    return @filename if @filename.present?
+    ext = File.extname(@file.original_filename)
+    @filename = "#{SecureRandom.uuid}#{ext}"
+  end
+
+end
+~~~
+
+使用 `UploadFileService` 也非常简单，可以参考相关控制器的代码:
+
+~~~ruby
+
+# app/controllers/avatars_controller.rb
+
+class AvatarsController < ApplicationController
+
+  def create
+    @avatar = Avatar.new
+    file = params[:avatar][:attachment_file_name]
+	
+   # 调用图片上传服务将图片上传到图片服务器
+   # 并将图片名字存入到数据库
+    res = UploadFileService.new(file).call
+    @avatar.attachment_file_name = res[:filename]
+    @avatar.attachment_content_type = res[:content_type]
+    if @avatar.save
+      redirect_to action: 'index'
+    else
+      render :new
+    end
+  end
+
+end
+
+~~~
+
+#### 3.3.3 测试与验证
+
+![mongo image gif](/images/mongo-image.gif)
 
 ## 参考
 
