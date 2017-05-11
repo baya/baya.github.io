@@ -208,9 +208,9 @@ Spree::Core::Engine 中也许是为了把 spree 打造成一个开发电商项�
 <center>Spree 支付架构图 </center>
 
 基于 spree 的电商项目中，支付方法有两类: 第一类需要需要请求远程支付网关, 第二类不需要请求远程支付网关，比如现金支付，银行转帐然后由客服确认等。
-第一类支付方法在 spree 中叫 Spree::GateWay, 第二类支付方法在 spree 中叫 Spree::PaymentMethod, 但要注意的是 Spree::GateWay 是从 Spree::PaymentMethod
-继承出来的，因为 Spree::GateWay 也是支付方法。Spree::GateWay 类型的支付方法需要提供一个 provider, 和远程支付网关交互的 api 都是在 provider 中实现的，当然有时候
-provider 是支付方法本身，比如 Spree::GateWay::Bogous (一个伪造的支付方法，用于测试目的) 的 provider 就是其自身。 为了更详细的查看 spree 中和支付相关的代码，我们可以将 spree_core 的代码解压缩出来，
+第一类支付方法在 spree 中叫 Spree::Gateway, 第二类支付方法在 spree 中叫 Spree::PaymentMethod, 但要注意的是 Spree::Gateway 是从 Spree::PaymentMethod
+继承出来的，因为 Spree::Gateway 也是支付方法。Spree::Gateway 类型的支付方法需要提供一个 provider, 和远程支付网关交互的 api 都是在 provider 中实现的，当然有时候
+provider 是支付方法本身，比如 Spree::Gateway::Bogous (一个伪造的支付方法，用于测试目的) 的 provider 就是其自身。 为了更详细的查看 spree 中和支付相关的代码，我们可以将 spree_core 的代码解压缩出来，
 
 ~~~bash
 $ gem unpack spree_core
@@ -218,9 +218,9 @@ $ gem unpack spree_core
 
 ### 3.3 实现 PayU Gateway
 
-由 Spree 支付架构图我们可以看出，实现 Spree::GateWay 类型的支付方法需要做以下一些工作:
+由 Spree 支付架构图我们可以看出，实现 Spree::Gateway 类型的支付方法需要做以下一些工作:
 
-1. 创建一个具体的类，为了方便描述我们称此类为 A, 并且 A 继承于 Spree::GateWay。
+1. 创建一个具体的类，为了方便描述我们称此类为 A, 并且 A 继承于 Spree::Gateway。
 
 2. 在数据库中创建一条 spree\_payment\_methods 记录, 假设这条记录叫 m。
 
