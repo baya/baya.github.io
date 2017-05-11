@@ -227,12 +227,12 @@ end
 
 3. 由 ActiveRecord::Base 类调用 transaction 方法
 
-	~~~ruby
-	ActiveRecord::Base.transaction do
-	  balance.save!
-	  account.save!
-	end
-	~~~
+~~~ruby
+ActiveRecord::Base.transaction do
+balance.save!
+account.save!
+end
+~~~
 
 
 为了进行上面的 3 个试验，我们需要增加一个新的模型: Balance

@@ -48,9 +48,9 @@ title: 一个简单的 Sql Builder
 
 ~~~ruby
   if sql == "where"
-    sql << " b = #{params[:c]}" if params[:b].present?
+    sql << " c = #{params[:c]}" if params[:b].present?
   else
-    sql << " and b = #{params[:c]}" if params[:c].present?
+    sql << " and c = #{params[:c]}" if params[:c].present?
   end
 ~~~
 
