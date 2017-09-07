@@ -6,7 +6,7 @@ permalink: /vpn/
 
 云梯 VPN 的优惠链接 [http://refcodeyt.com/?r=048d275bbc1c1f9c](http://refcodeyt.com/?r=048d275bbc1c1f9c)
 
-## 把云梯推荐给朋友们
+## 太好用了, 不得不推荐下
 
 非常好用的 VPN, 自由选择服务器，一键出墙.
 
