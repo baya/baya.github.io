@@ -373,14 +373,14 @@ title: Rails Style Guide 注解
   Use named scopes freely.
 <sup>[同意]</sup>
 
-  ~~~ruby
-  class User < ActiveRecord::Base
-    scope :active, -> { where(active: true) }
-    scope :inactive, -> { where(active: false) }
+```ruby
+class User < ActiveRecord::Base
+scope :active, -> { where(active: true) }
+scope :inactive, -> { where(active: false) }
 
-    scope :with_orders, -> { joins(:orders).select('distinct(users.id)') }
-  end
-  ~~~
+scope :with_orders, -> { joins(:orders).select('distinct(users.id)') }
+end
+```
 
 * <a name="named-scope-class"></a>
   When a named scope defined with a lambda and parameters becomes too
@@ -390,40 +390,40 @@ title: Rails Style Guide 注解
 
 <sup>[同意]</sup>
 
-  ~~~ruby
-  class User < ActiveRecord::Base
-    def self.with_orders
-      joins(:orders).select('distinct(users.id)')
-    end
-  end
-  ~~~
+~~~ruby
+class User < ActiveRecord::Base
+def self.with_orders
+joins(:orders).select('distinct(users.id)')
+end
+end
+~~~
 
   Note that this style of scoping cannot be chained in the same way as named scopes. For instance:
 
   这里应该不是 unchainable 而是 chainable,
   
-  ~~~ruby
+  ```ruby
   # unchainable
-  class User < ActiveRecord::Base
-    def User.old
-      where('age > ?', 80)
-    end
+ class User < ActiveRecord::Base
+   def User.old
+     where('age > ?', 80)
+   end
 
-    def User.heavy
-      where('weight > ?', 200)
-    end
-  end
-  ~~~
+   def User.heavy
+     where('weight > ?', 200)
+   end
+ end
+```
   
-  In this style both `old` and `heavy` work individually, but you cannot call `User.old.heavy`, to chain these scopes use:
+In this style both `old` and `heavy` work individually, but you cannot call `User.old.heavy`, to chain these scopes use:
 
-  ~~~ruby
-  # chainable
-  class User < ActiveRecord::Base
-    scope :old, -> { where('age > 60') }
-    scope :heavy, -> { where('weight > 200') }
-  end
-  ~~~
+~~~ruby
+# chainable
+class User < ActiveRecord::Base
+scope :old, -> { where('age > 60') }
+scope :heavy, -> { where('weight > 200') }
+end
+~~~
 
 * <a name="beware-update-attribute"></a>
   Beware of the behavior of the
@@ -442,13 +442,13 @@ title: Rails Style Guide 注解
     the `id` of the record as a String.  It could be overridden to include another
     human-readable attribute.
 
-      ~~~ruby
-      class Person
-        def to_param
-          "#{id} #{name}".parameterize
-        end
-      end
-      ~~~
+~~~ruby
+class Person
+def to_param
+"#{id} #{name}".parameterize
+end
+end
+~~~
 
   In order to convert this to a URL-friendly value, `parameterize` should be
   called on the string. The `id` of the object needs to be at the beginning so
@@ -457,12 +457,12 @@ title: Rails Style Guide 注解
   * Use the `friendly_id` gem. It allows creation of human-readable URLs by
     using some descriptive attribute of the model instead of its `id`.
 
-      ~~~ruby
-      class Person
-        extend FriendlyId
-        friendly_id :name, use: :slugged
-      end
-      ~~~
+~~~ruby
+class Person
+extend FriendlyId
+friendly_id :name, use: :slugged
+end
+~~~
 
   Check the [gem documentation](https://github.com/norman/friendly_id) for more
   information about its usage.
@@ -476,25 +476,25 @@ title: Rails Style Guide 注解
 <sup>[同意]</sup>
 
 
-  ~~~ruby
-  # bad
-  Person.all.each do |person|
-    person.do_awesome_stuff
-  end
+~~~ruby
+# bad
+Person.all.each do |person|
+person.do_awesome_stuff
+end
 
-  Person.where('age > 21').each do |person|
-    person.party_all_night!
-  end
+Person.where('age > 21').each do |person|
+person.party_all_night!
+end
 
-  # good
-  Person.find_each do |person|
-    person.do_awesome_stuff
-  end
+# good
+Person.find_each do |person|
+person.do_awesome_stuff
+end
 
-  Person.where('age > 21').find_each do |person|
-    person.party_all_night!
-  end
-  ~~~
+Person.where('age > 21').find_each do |person|
+person.party_all_night!
+end
+~~~
 
 * <a name="before_destroy"></a>
   Since [Rails creates callbacks for dependent
