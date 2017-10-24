@@ -14,5 +14,16 @@ title: 区块链技术探索(二), 打造我们自己的比特币
 
 Talk is cheap, show me the code, 让我们从最简单的地方出发: 模仿中本聪的比特币.
 
-## 1. 发送比特币交易
+## 1. 区块链的存储
+
+## 2. 交易的验证
+
+## 3. P2P 网络
+
+## 4. 参考
+
+<b id="ref-1">[1]</b> [https://bitcoin.stackexchange.com/questions/28168/what-are-the-keys-used-in-the-blockchain-leveldb-ie-what-are-the-keyvalue-pair](https://bitcoin.stackexchange.com/questions/28168/what-are-the-keys-used-in-the-blockchain-leveldb-ie-what-are-the-keyvalue-pair) What are the keys used in the blockchain levelDB?
+
+<b id="ref-2">[2]</b> [https://en.bitcoin.it/wiki/Bitcoin\_Core\_0.11\_(ch_2):\_Data\_Storage](https://en.bitcoin.it/wiki/Bitcoin_Core_0.11_(ch_2):_Data_Storage) Bitcoin Core Data Storage
+
 
