@@ -9,7 +9,58 @@ Talk is cheap, show me the code, 让我们从最简单的地方出发: 模仿中
 
 ## 1. 区块链的存储
 
-在 [构造比特币的创世区块](/2017/05/11/7daystalk.html) 这篇文章中我们把生成的创世区块写到了一个叫 kyk-gens-block.dat 的文件中，这时候我们已经初步完成区块链的存储, 现在我们要为其加上索引, 在比特币的世界里, 使用了 [LevelDB](https://github.com/google/leveldb)<sup>[[1]](#ref-1)</sup> 来存储这些索引, 设计索引是一种比较精巧细致的活, 我们可以参考 [Bitcoin Core Data Storage](https://en.bitcoin.it/wiki/Bitcoin_Core_0.11_(ch_2):_Data_Storage)<sup>[[2]](#ref-2)</sup> 用自己的代码来一步步实现索引.
+在 [构造比特币的创世区块](/2017/05/11/7daystalk.html) 这篇文章中我们把生成的创世区块写到了一个叫 kyk-gens-block.dat 的文件中，这时候我们已经初步完成区块链的存储, 现在我们要为其加上索引, 在比特币的世界里, 使用了 [LevelDB](https://github.com/google/leveldb)<sup>[[1]](#ref-1)</sup> 来存储这些索引, 设计索引是一件比较精巧细致的活, 我们可以参考 [Bitcoin Core Data Storage](https://en.bitcoin.it/wiki/Bitcoin_Core_0.11_(ch_2):_Data_Storage)<sup>[[2]](#ref-2)</sup> 用自己的代码来一步步实现索引.
+
+### 1.1 比特币的后端存储结构
+
+![btc_backend_struct.png](/images/btc_backend_struct.png)
+
+<b>Block index (leveldb)</b><sup>[[10]](#ref-10)</sup>
+
+Key-value pairs
+
+Inside the actual LevelDB, the used key/value pairs are:
+
+```
+   'b' + 32-byte block hash -> block index record. Each record stores:
+       * The block header                                                   
+       * The height.                                                       
+       * The number of transactions.                                        
+       * To what extent this block is validated.
+       * In which file, and where in that file, the block data is stored.
+       * In which file, and where in that file, the undo data is stored.
+```
+
+```
+   'f' + 4-byte file number -> file information record. Each record stores:
+       * The number of blocks stored in the block file with that number.
+       * The size of the block file with that number ($DATADIR/blocks/blkNNNNN.dat).
+       * The size of the undo file with that number ($DATADIR/blocks/revNNNNN.dat).
+       * The lowest and highest height of blocks stored in the block file with that number.
+       * The lowest and highest timestamp of blocks stored in the block file with that number.
+```
+
+```
+   'l' -> 4-byte file number: the last block file number used.
+```
+
+```
+   'R' -> 1-byte boolean ('1' if true): whether we're in the process of reindexing.
+```
+
+```
+   'F' + 1-byte flag name length + flag name string -> 1 byte boolean ('1' if true, '0' if false): various flags that can be on or off. Currently defined flags include:
+        * 'txindex': Whether the transaction index is enabled.
+```
+
+```
+   't' + 32-byte transaction hash -> transaction index record. These are optional and only exist if 'txindex' is enabled (see above). Each record stores:
+       * Which block file number the transaction is stored in.
+       * Which offset into that file the block the transaction is part of is stored at.
+       * The offset from the start of that block to the position where that transaction itself is stored.
+```
+
+### 1.2 参照比特币存储我们自己创建的创世区块
 
 ## 2. 交易的验证
 
@@ -34,3 +85,5 @@ Talk is cheap, show me the code, 让我们从最简单的地方出发: 模仿中
 <b id="ref-8">[8]</b> [http://www.cnblogs.com/pandang/p/7279306.html](http://www.cnblogs.com/pandang/p/7279306.html) LevelDB C API 整理分类
 
 <b id="ref-9">[9]</b> [https://github.com/bit-c/bitc](https://github.com/bit-c/bitc) bitc is a thin SPV bitcoin client 100% C code
+
+<b id="ref-10">[10]</b> [https://en.bitcoin.it/wiki/Bitcoin\_Core\_0.11\_(ch\_2):\_Data\_Storage#Block\_index\_.28leveldb.29](https://en.bitcoin.it/wiki/Bitcoin_Core_0.11_(ch_2):_Data_Storage#Block_index_.28leveldb.29) Block index (leveldb)
