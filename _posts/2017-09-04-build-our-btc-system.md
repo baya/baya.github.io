@@ -60,6 +60,30 @@ Inside the actual LevelDB, the used key/value pairs are:
        * The offset from the start of that block to the position where that transaction itself is stored.
 ```
 
+<b>The UTXO set (chainstate leveldb)</b><sup>[[11]](#ref-11)</sup>
+
+Key-value pairs
+
+The records in the chainstate levelDB are:
+
+```
+   'c' + 32-byte transaction hash -> unspent transaction output record for that transaction. These records are only present for transactions that have at least one unspent output left. Each record stores:
+       * The version of the transaction.
+       * Whether the transaction was a coinbase or not.
+       * Which height block contains the transaction.
+       * Which outputs of that transaction are unspent.
+       * The scriptPubKey and amount for those unspent outputs.
+
+
+   'B' -> 32-byte block hash: the block hash up to which the database represents the unspent transaction outputs.
+```
+
+下面我们要做的工作就是将上面的 'b', 'f', 'l', 'R', 'F', 't', 'c', 'B' 这 8 种类型的 key/value pairs 从 Block index (leveldb) 数据库中正确的读取出来，并将对应的 value 解析出来. 作为热身我们先写一个简短的程序来熟悉下 leveldb.
+
+#### 1.1.1 leveldb 热身
+
+#### 1.1.2 读取 'b', 'f', 'l', 'R', 'F', 't', 'c', 'B' key/value pairs
+
 ### 1.2 参照比特币存储我们自己创建的创世区块
 
 ## 2. 交易的验证
@@ -87,3 +111,5 @@ Inside the actual LevelDB, the used key/value pairs are:
 <b id="ref-9">[9]</b> [https://github.com/bit-c/bitc](https://github.com/bit-c/bitc) bitc is a thin SPV bitcoin client 100% C code
 
 <b id="ref-10">[10]</b> [https://en.bitcoin.it/wiki/Bitcoin\_Core\_0.11\_(ch\_2):\_Data\_Storage#Block\_index\_.28leveldb.29](https://en.bitcoin.it/wiki/Bitcoin_Core_0.11_(ch_2):_Data_Storage#Block_index_.28leveldb.29) Block index (leveldb)
+
+<b id="ref-11">[11]</b> [https://en.bitcoin.it/wiki/Bitcoin\_Core\_0.11\_(ch\_2):\_Data\_Storage#The\_UTXO\_set\_.28chainstate\_leveldb.29](https://en.bitcoin.it/wiki/Bitcoin_Core_0.11_(ch_2):_Data_Storage#The_UTXO_set_.28chainstate_leveldb.29) The UTXO set (chainstate leveldb)
