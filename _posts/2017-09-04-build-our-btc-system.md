@@ -197,7 +197,20 @@ error:
 
 ```
 
+为了编译运行上面的程序，我们首先: `git clone git@github.com:baya/mybt_coin.git`, 然后 `cd mybt_coin`,
 
+```bash
+$ make dbg
+
+$./debug/level_db_api_debug.out
+
+get value: 123 from key: abc, value len: 4
+get value: bar from key: foo, value len: 4
+key=foo value=bar
+key=foo1 value=bar1
+key=foo2 value=bar2
+key=foo4 value=bar4
+```
 
 #### 1.1.2 读取 'b', 'f', 'l', 'R', 'F', 't', 'c', 'B' key/value pairs
 
