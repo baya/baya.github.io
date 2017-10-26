@@ -3,7 +3,7 @@ layout: post
 title: 区块链技术探索(二), 打造我们自己的比特币
 ---
 
-> 我们要用匠人的精神设计实现一款让人爱不释手，欲罢不能的产品, 这款产品的分类恰好是货币.
+> 让我们用匠人的精神设计实现一款让人爱不释手，欲罢不能的产品, 这款产品的分类恰好是货币.
 
 Talk is cheap, show me the code, 让我们从最简单的地方出发: 模仿中本聪的比特币.
 
@@ -85,7 +85,7 @@ The records in the chainstate levelDB are:
 leveldb 中几乎所有的 c++ 接口都有对应的 c 接口, c 接口在 [leveldb/c.h](https://github.com/google/leveldb/blob/master/include/leveldb/c.h) 中定义.
 
 在程序 [level_db_api_debug.c]() 中，我们对 leveldb 中的 `打开数据库`, `读`, `写`, `批量写`, `删除`, `迭代` 等 api 进行了实验, 程序中以 `leveldb`
-开头的函数和数据结构都来自于 `leveldb/c.h`. 用于检查错误的宏: `check` 来自于 dbg.h 文件，这个和 leveldb 没有关系。
+开头的函数和数据结构都来自于 `leveldb/c.h`. 用于检查错误的宏: `check` 则来自于 dbg.h 文件，这个和 leveldb 没有关系。
 
 ```c
 #include <unistd.h>
@@ -216,7 +216,7 @@ key=foo4 value=bar4
 
 ### 1.2 参照比特币存储我们自己创建的创世区块
 
-## 2. 交易的验证
+## 2. 交易和区块的验证
 
 ## 3. P2P 网络
 
