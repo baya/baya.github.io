@@ -216,9 +216,9 @@ key=foo4 value=bar4
 
 #### 1.1.2 读取 'b', 'f', 'l', 'R', 'F', 't', 'c', 'B' key/value pairs
 
-1. <b>读取 'b' key</b>
+<b> 1. 读取 'b' key</b>
 
-程序: [debug/read_b_key_debug.c](https://github.com/baya/mybt_coin/tree/master/debug/read_b_key_debug.c)
+程序: [read_b_key_debug.c](https://github.com/baya/mybt_coin/tree/master/debug/read_b_key_debug.c)
 
 编译运行程序:
 
@@ -259,13 +259,146 @@ nNonce:2145410362
 
 ![bkey-format](/images/bkey-format.png)
 
+下面的这些数据是通过 `varint` 编码的，但是这个 `varint`<sup>[[14]](#ref-14)</sup> 和以前的 `varint`<sup>[[13]](#ref-13)</sup> 不一样,
+
+```c
+    // wallet version
+    int wVersion = 0;
+
+    //! height of the entry in the chain. The genesis block has height 0
+    int nHeight = 0;
+
+    //! Verification status of this block.
+    uint32_t nStatus = 0;
+
+    //! Number of transactions in this block.
+    //! Note: in a potential headers-first mode, this number cannot be relied upon
+    unsigned int nTx = 0;
+
+    //! Which # file this block is stored in (blk?????.dat)
+    int nFile = 0;
+
+     //! Byte offset within blk?????.dat where this block's data is stored
+    unsigned int nDataPos = 0;
+
+    //! Byte offset within rev?????.dat where this block's undo data is stored
+    unsigned int nUndoPos = 0;
+```
+
+它们的编码和解码方式如下,
+
+编码:
+
+```c
+size_t pack_varint(uint8_t *buf, int n)
+{
+    unsigned char tmp[(sizeof(n)*8+6)/7];
+    int len=0;
+    while(1) {
+        tmp[len] = (n & 0x7F) | (len ? 0x80 : 0x00);
+        if (n <= 0x7F)
+            break;
+        n = (n >> 7) - 1;
+        len++;
+    }
+
+    kyk_reverse_pack_chars(buf, tmp, len+1);
+
+    return len+1;
+}
+```
+
+解码:
+
+```c
+size_t read_varint(const uint8_t *buf, size_t len, uint32_t *val)
+{
+    uint32_t n = 0;
+    
+    size_t i = 0;
+
+    while(i < len) {
+        unsigned char chData = *buf;
+	buf++;
+        n = (n << 7) | (chData & 0x7F);
+        if (chData & 0x80) {
+	    i++;
+            n++;
+        } else {
+	    *val = n;
+	    i++;
+            return i;
+        }
+    }
+
+    return 0;
+}
+
+```
+
+<b> 2. 读取 'f' key</b>
+
+程序: [read_f_key_debug.c](https://github.com/baya/mybt_coin/tree/master/debug/read_f_key_debug.c)
+
+编译运行程序:
+
+```bash
+$ make dbg
+
+$ ./debug/read_f_key_debug.out 1
+```
+
+输出:
+
+```text
+
+fkey : 6601000000
+raw value : d703befd9860878acc1186a57e87804983ecc7e61b83eee7f21d
+nBlocks: 11267 (number of blocks stored in file)
+nSize: 134188256 (number of used bytes of block file)
+nUndoSize: 16967313 (number of used bytes in the undo file)
+nHeightFirst: 119678 (lowest height of block in file)
+nHeightLast: 131273 (highest height of block in file)
+nTimeFirst: 1303524251 (earliest time of block in file)
+nTimeLast: 1308244381 (latest time of block in file)
+
+```
+
+'f' key 对应的 raw value 的格式如下所示, 它们都是以 varint<sup>[[14]](#ref-14)</sup> 的格式写入到 leveldb 中的.
+
+```c
+
+unsigned int nBlocks;      //!< number of blocks stored in file
+unsigned int nSize;        //!< number of used bytes of block file
+unsigned int nUndoSize;    //!< number of used bytes in the undo file
+unsigned int nHeightFirst; //!< lowest height of block in file
+unsigned int nHeightLast;  //!< highest height of block in file
+uint64_t nTimeFirst;       //!< earliest time of block in file
+uint64_t nTimeLast;        //!< latest time of block in file
+
+```
+
+<b> 3. 读取 </b> _'l'_ <b>key</b>
+
+<b> 4. 读取 'R' key</b>
+
+<b> 5. 读取 'F' key</b>
+
+<b> 6. 读取 't' key</b>
+
+<b> 7. 读取 'c' key</b>
+
+<b> 8. 读取 'B' key</b>
+
 ### 1.2 以比特币为参照, 存储我们自己创建的创世区块
 
 ## 2. 交易和区块的验证
 
-## 3. P2P 网络
+## 3. RPC 服务
 
-## 4. 参考资料
+## 4. P2P 网络
+
+## 5. 参考资料
 
 <b id="ref-1">[1]</b> [https://bitcoin.stackexchange.com/questions/28168/what-are-the-keys-used-in-the-blockchain-leveldb-ie-what-are-the-keyvalue-pair](https://bitcoin.stackexchange.com/questions/28168/what-are-the-keys-used-in-the-blockchain-leveldb-ie-what-are-the-keyvalue-pair) What are the keys used in the blockchain levelDB?
 
@@ -290,3 +423,51 @@ nNonce:2145410362
 <b id="ref-11">[11]</b> [https://en.bitcoin.it/wiki/Bitcoin\_Core\_0.11\_(ch\_2):\_Data\_Storage#The\_UTXO\_set\_.28chainstate\_leveldb.29](https://en.bitcoin.it/wiki/Bitcoin_Core_0.11_(ch_2):_Data_Storage#The_UTXO_set_.28chainstate_leveldb.29) The UTXO set (chainstate leveldb)
 
 <b id="ref-12">[12]</b> [https://github.com/bitcoin/bitcoin/blob/f914f1a746d7f91951c1da262a4a749dd3ebfa71/src/chain.h#L295](https://github.com/bitcoin/bitcoin/blob/f914f1a746d7f91951c1da262a4a749dd3ebfa71/src/chain.h#L295) Bitcoin Block index SerializationOp
+
+<b id="ref-13">[13]</b> [https://en.bitcoin.it/wiki/Protocol_documentation#Variable_length_integer](https://en.bitcoin.it/wiki/Protocol_documentation#Variable_length_integer) Variable length integer
+
+<b id="ref-14">[14]</b> 本文的 varint 的解码和编码方式如下, 如果没有特殊说, 明本文的 varint 都按下面的方式进行解码和编码.
+
+```c
+size_t read_varint(const uint8_t *buf, size_t len, uint32_t *val)
+{
+    uint32_t n = 0;
+    
+    size_t i = 0;
+
+    while(i < len) {
+        unsigned char chData = *buf;
+	buf++;
+        n = (n << 7) | (chData & 0x7F);
+        if (chData & 0x80) {
+	    i++;
+            n++;
+        } else {
+	    *val = n;
+	    i++;
+            return i;
+        }
+    }
+
+    return 0;
+}
+
+
+size_t pack_varint(uint8_t *buf, int n)
+{
+    unsigned char tmp[(sizeof(n)*8+6)/7];
+    int len=0;
+    while(1) {
+        tmp[len] = (n & 0x7F) | (len ? 0x80 : 0x00);
+        if (n <= 0x7F)
+            break;
+        n = (n >> 7) - 1;
+        len++;
+    }
+
+    kyk_reverse_pack_chars(buf, tmp, len+1);
+
+    return len+1;
+}
+
+```
