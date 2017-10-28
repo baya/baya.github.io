@@ -200,6 +200,8 @@ error:
 为了编译运行上面的程序，我们首先: `git clone git@github.com:baya/mybt_coin.git`, 然后 `cd mybt_coin`,
 
 ```bash
+$ make
+
 $ make dbg
 
 $./debug/level_db_api_debug.out
@@ -213,6 +215,43 @@ key=foo4 value=bar4
 ```
 
 #### 1.1.2 读取 'b', 'f', 'l', 'R', 'F', 't', 'c', 'B' key/value pairs
+
+1. 读取 'b' key
+
+程序: [debug/read_b_key_debug.c](https://github.com/baya/mybt_coin/tree/master/debug/read_b_key_debug.c)
+
+编译运行程序:
+
+```bash
+$ make dbg
+
+$ ./debug/read_b_key_debug.out 0000000099c744455f58e6c6e98b671e1bf7f37346bfd4cf5d0274ad8ee660cb
+```
+
+其中 `read_b_key_debug.out` 程序接收一个 block hash 参数.
+
+输出:
+
+```text
+
+bkey : 62cb60e68ead74025dcfd4bf4673f3f71b1e678be9c6e6585f4544c79900000000
+raw value : 889271cd101d0100808cbf1199b74701000000a7c3299ed2475e1d6ea5ed18d5bfe243224add249cce99c5c67cc9fb00000000601c73862a0a7238e376f497783c8ecca2cf61a4f002ec8898024230787f399cb575d949ffff001d3a5de07f
+wVersion: 150001
+nHeight: 10000
+nStatus: 29
+nTx: 1
+nFile: 0
+nDataPos: 2318353
+nUndoPos: 433223
+Following is Block Header:
+nVersion:1
+PrevHash : 00000000fbc97cc6c599ce9c24dd4a2243e2bfd518eda56e1d5e47d29e29c3a7
+hashMerkleRoot : 9c397f783042029888ec02f0a461cfa2cc8e3c7897f476e338720a2a86731c60
+nTime:1238988213
+nBits:1d00ffff
+nNonce:2145410362
+
+```
 
 ### 1.2 参照比特币存储我们自己创建的创世区块
 
@@ -243,3 +282,5 @@ key=foo4 value=bar4
 <b id="ref-10">[10]</b> [https://en.bitcoin.it/wiki/Bitcoin\_Core\_0.11\_(ch\_2):\_Data\_Storage#Block\_index\_.28leveldb.29](https://en.bitcoin.it/wiki/Bitcoin_Core_0.11_(ch_2):_Data_Storage#Block_index_.28leveldb.29) Block index (leveldb)
 
 <b id="ref-11">[11]</b> [https://en.bitcoin.it/wiki/Bitcoin\_Core\_0.11\_(ch\_2):\_Data\_Storage#The\_UTXO\_set\_.28chainstate\_leveldb.29](https://en.bitcoin.it/wiki/Bitcoin_Core_0.11_(ch_2):_Data_Storage#The_UTXO_set_.28chainstate_leveldb.29) The UTXO set (chainstate leveldb)
+
+<b id="ref-12">[12]</b> [https://github.com/bitcoin/bitcoin/blob/f914f1a746d7f91951c1da262a4a749dd3ebfa71/src/chain.h#L295](https://github.com/bitcoin/bitcoin/blob/f914f1a746d7f91951c1da262a4a749dd3ebfa71/src/chain.h#L295) Bitcoin Block index SerializationOp
