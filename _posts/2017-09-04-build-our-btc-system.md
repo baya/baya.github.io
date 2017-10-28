@@ -216,7 +216,7 @@ key=foo4 value=bar4
 
 #### 1.1.2 读取 'b', 'f', 'l', 'R', 'F', 't', 'c', 'B' key/value pairs
 
-1. 读取 'b' key
+1. <b>读取 'b' key</b>
 
 程序: [debug/read_b_key_debug.c](https://github.com/baya/mybt_coin/tree/master/debug/read_b_key_debug.c)
 
@@ -228,7 +228,7 @@ $ make dbg
 $ ./debug/read_b_key_debug.out 0000000099c744455f58e6c6e98b671e1bf7f37346bfd4cf5d0274ad8ee660cb
 ```
 
-其中 `read_b_key_debug.out` 程序接收一个 block hash 参数.
+其中 `read_b_key_debug.out` 程序接收一个 block hash 作为参数.
 
 输出:
 
@@ -253,7 +253,13 @@ nNonce:2145410362
 
 ```
 
-### 1.2 参照比特币存储我们自己创建的创世区块
+'b' key 的构造步骤: 首先将 block hash 的字节倒序得到: `cb60e68ead74025dcfd4bf4673f3f71b1e678be9c6e6585f4544c79900000000`, 然后将 'b' 的字节 0x62 作为首位与前者合并就得到了 'b' key.
+
+'b' key 对应的 raw value 的格式如下图所示:
+
+![bkey-format](/images/bkey-format.png)
+
+### 1.2 以比特币为参照, 存储我们自己创建的创世区块
 
 ## 2. 交易和区块的验证
 
