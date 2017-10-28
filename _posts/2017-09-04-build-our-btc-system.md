@@ -380,6 +380,26 @@ uint64_t nTimeLast;        //!< latest time of block in file
 
 <b> 3. 读取 </b> _'l'_ <b>key</b>
 
+程序: [read_l_key_debug.c](https://github.com/baya/mybt_coin/tree/master/debug/read_l_key_debug.c)
+
+编译运行程序:
+
+```bash
+$ make dbg
+
+$ ./debug/read_l_key_debug.out
+```
+
+输出:
+
+```text
+
+lkey : 6c
+raw value : 60000000
+nFile: 96 (the last block file number used)
+
+```
+
 <b> 4. 读取 'R' key</b>
 
 <b> 5. 读取 'F' key</b>
