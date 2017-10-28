@@ -216,7 +216,7 @@ key=foo4 value=bar4
 
 #### 1.1.2 读取 'b', 'f', 'l', 'R', 'F', 't', 'c', 'B' key/value pairs
 
-<b> 1. 读取 'b' key</b>
+<b> 1. 读取 'b' key</b>: 'b' + 32-byte block hash
 
 程序: [read_b_key_debug.c](https://github.com/baya/mybt_coin/tree/master/debug/read_b_key_debug.c)
 
@@ -336,7 +336,7 @@ size_t read_varint(const uint8_t *buf, size_t len, uint32_t *val)
 
 ```
 
-<b> 2. 读取 'f' key</b>
+<b> 2. 读取 'f' key</b>: 'f' + 4-byte file number
 
 程序: [read_f_key_debug.c](https://github.com/baya/mybt_coin/tree/master/debug/read_f_key_debug.c)
 
