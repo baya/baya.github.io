@@ -426,7 +426,7 @@ uint64_t nTimeLast;        //!< latest time of block in file
 
 <b id="ref-13">[13]</b> [https://en.bitcoin.it/wiki/Protocol_documentation#Variable_length_integer](https://en.bitcoin.it/wiki/Protocol_documentation#Variable_length_integer) Variable length integer
 
-<b id="ref-14">[14]</b> 本文的 varint 的解码和编码方式如下, 如果没有特殊说, 明本文的 varint 都按下面的方式进行解码和编码.
+<b id="ref-14">[14]</b> 本文的 varint 的解码和编码方式如下, 如果没有特殊说明, 本文的 varint 都按下面的方式进行解码和编码.
 
 ```c
 size_t read_varint(const uint8_t *buf, size_t len, uint32_t *val)
