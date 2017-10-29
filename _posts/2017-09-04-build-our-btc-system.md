@@ -446,6 +446,8 @@ raw value : 30
 txindex: false
 ```
 
+上面的 30 其身是字符 '0' 的 Hex 表示值, 字符 '0' 用于表示 false, 字符 '1' 用于表示 true.
+
 <b> 6. 读取 't' key</b>
 
 <b> 7. 读取 'c' key</b>
