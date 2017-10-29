@@ -450,21 +450,68 @@ txindex: false
 
 <b> 6. 读取 't' key</b>
 
-<b> 7. 读取 'c' key</b>
+程序: [read_t_key_debug.c](https://github.com/baya/mybt_coin/tree/master/debug/read_t_key_debug.c)
+
+编译运行程序:
+
+```bash
+$ make dbg
+
+$./debug/read_t_key_debug.out 4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b
+```
+
+输出:
+
+```text
+No record Found
+```
+
+貌似我下载的比特币钱包没有对交易进行索引.
+
+<b> 7. 读取 'c' key<sup>[[15]](#ref-15)</sup></b>
+
+`'c' + 32-byte transaction hash`
+
+程序: [read_c_key_debug.c](https://github.com/baya/mybt_coin/tree/master/debug/read_c_key_debug.c)
+
+编译运行程序:
+
+```bash
+$ make dbg
+
+$./debug/read_c_key_debug.out 4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b
+```
+
+输出:
+
+```text
+ckey : 633ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a
+No record Found
+```
 
 <b> 8. 读取 'B' key</b>
+
+程序: [read_cap_b_key_debug.c](https://github.com/baya/mybt_coin/tree/master/debug/read_cap_b_key_debug.c)
+
+输出:
+
+```text
+Bkey : 42
+raw value : 9acae02f84a810af603bc486996f273b9394ab1b308e56402d3f7171111520f9
+```
+
+得到的 raw value 不是一个 block hash, 不知道是什么原因.
+
 
 ### 1.2 以比特币为参照, 存储我们自己创建的创世区块
 
 ## 2. 交易和区块的验证
 
-## 3. RPC 服务
+## 3. 钱包
 
-## 4. 钱包
+## 4. P2P 网络
 
-## 5. P2P 网络
-
-## 6. 参考资料
+## 5. 参考资料
 
 <b id="ref-1">[1]</b> [https://bitcoin.stackexchange.com/questions/28168/what-are-the-keys-used-in-the-blockchain-leveldb-ie-what-are-the-keyvalue-pair](https://bitcoin.stackexchange.com/questions/28168/what-are-the-keys-used-in-the-blockchain-leveldb-ie-what-are-the-keyvalue-pair) What are the keys used in the blockchain levelDB?
 
@@ -537,3 +584,5 @@ size_t pack_varint(uint8_t *buf, int n)
 }
 
 ```
+
+<b id="ref-15">[15]</b> [https://github.com/bitcoin/bitcoin/blob/d4a42334d447cad48fb3996cad0fd5c945b75571/src/coins.h#L19](https://github.com/bitcoin/bitcoin/blob/d4a42334d447cad48fb3996cad0fd5c945b75571/src/coins.h#L19)  Serialized format of UTXO
