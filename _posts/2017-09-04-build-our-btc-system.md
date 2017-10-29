@@ -216,7 +216,9 @@ key=foo4 value=bar4
 
 #### 1.1.2 读取 'b', 'f', 'l', 'R', 'F', 't', 'c', 'B' key/value pairs
 
-<b> 1. 读取 'b' key</b>: 'b' + 32-byte block hash
+<b> 1. 读取 'b' key</b>
+
+`'b' + 32-byte block hash`
 
 程序: [read_b_key_debug.c](https://github.com/baya/mybt_coin/tree/master/debug/read_b_key_debug.c)
 
@@ -336,7 +338,9 @@ size_t read_varint(const uint8_t *buf, size_t len, uint32_t *val)
 
 ```
 
-<b> 2. 读取 'f' key</b>: 'f' + 4-byte file number
+<b> 2. 读取 'f' key</b>
+
+`'f' + 4-byte file number`
 
 程序: [read_f_key_debug.c](https://github.com/baya/mybt_coin/tree/master/debug/read_f_key_debug.c)
 
@@ -402,7 +406,45 @@ nFile: 96 (the last block file number used)
 
 <b> 4. 读取 'R' key</b>
 
+程序: [read_r_key_debug.c](https://github.com/baya/mybt_coin/tree/master/debug/read_r_key_debug.c)
+
+编译运行程序:
+
+```bash
+$ make dbg
+
+$ ./debug/read_r_key_debug.out
+```
+
+输出:
+
+```text
+Rkey : 52
+raw value : 
+nReindex: 0 (not reindexing)
+```
+
 <b> 5. 读取 'F' key</b>
+
+`'F' + 1-byte flag name length + flag name string`
+
+程序: [read_cap_f_key_debug.c](https://github.com/baya/mybt_coin/tree/master/debug/read_cap_f_key_debug.c)
+
+编译运行程序:
+
+```bash
+$ make dbg
+
+$ ./debug/read_cap_f_key_debug.out
+```
+
+输出:
+
+```text
+Fkey : 46077478696e646578
+raw value : 30
+txindex: false
+```
 
 <b> 6. 读取 't' key</b>
 
