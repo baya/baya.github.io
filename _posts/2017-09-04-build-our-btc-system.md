@@ -507,11 +507,9 @@ raw value : 9acae02f84a810af603bc486996f273b9394ab1b308e56402d3f7171111520f9
 
 ## 2. 交易和区块的验证
 
-## 3. 钱包
+## 3. P2P 网络
 
-## 4. P2P 网络
-
-## 5. 参考资料
+## 4. 参考资料
 
 <b id="ref-1">[1]</b> [https://bitcoin.stackexchange.com/questions/28168/what-are-the-keys-used-in-the-blockchain-leveldb-ie-what-are-the-keyvalue-pair](https://bitcoin.stackexchange.com/questions/28168/what-are-the-keys-used-in-the-blockchain-leveldb-ie-what-are-the-keyvalue-pair) What are the keys used in the blockchain levelDB?
 
