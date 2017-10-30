@@ -15,7 +15,7 @@ Talk is cheap, show me the code, 让我们从最简单的地方出发: 模仿中
 
 ![btc_backend_struct.png](/images/btc_backend_struct.png)
 
-<b>Block index (leveldb)</b><sup>[[10]](#ref-10)</sup>
+<b>Block index (leveldb)</b><sup>[[9]](#ref-10)</sup>
 
 Key-value pairs
 
@@ -60,7 +60,7 @@ Inside the actual LevelDB, the used key/value pairs are:
        * The offset from the start of that block to the position where that transaction itself is stored.
 ```
 
-<b>The UTXO set (chainstate leveldb)</b><sup>[[11]](#ref-11)</sup>
+<b>The UTXO set (chainstate leveldb)</b><sup>[[10]](#ref-10)</sup>
 
 Key-value pairs
 
@@ -261,7 +261,7 @@ nNonce:2145410362
 
 ![bkey-format](/images/bkey-format.png)
 
-下面的这些数据是通过 `varint` 编码的，但是这个 `varint`<sup>[[14]](#ref-14)</sup> 和以前的 `varint`<sup>[[13]](#ref-13)</sup> 不一样,
+下面的这些数据是通过 `varint` 编码的，但是这个 `varint`<sup>[[13]](#ref-13)</sup> 和以前的 `varint`<sup>[[12]](#ref-12)</sup> 不一样,
 
 ```c
     // wallet version
@@ -368,7 +368,7 @@ nTimeLast: 1308244381 (latest time of block in file)
 
 ```
 
-'f' key 对应的 raw value 的格式如下所示, 它们都是以 varint<sup>[[14]](#ref-14)</sup> 的格式写入到 leveldb 中的.
+'f' key 对应的 raw value 的格式如下所示, 它们都是以 varint<sup>[[13]](#ref-13)</sup> 的格式写入到 leveldb 中的.
 
 ```c
 
@@ -468,7 +468,7 @@ No record Found
 
 貌似我下载的比特币钱包没有对交易进行索引.
 
-<b> 7. 读取 'c' key<sup>[[15]](#ref-15)</sup></b>
+<b> 7. 读取 'c' key<sup>[[14]](#ref-14)</sup></b>
 
 `'c' + 32-byte transaction hash`
 
@@ -529,17 +529,15 @@ raw value : 9acae02f84a810af603bc486996f273b9394ab1b308e56402d3f7171111520f9
 
 <b id="ref-8">[8]</b> [http://www.cnblogs.com/pandang/p/7279306.html](http://www.cnblogs.com/pandang/p/7279306.html) LevelDB C API 整理分类
 
-<b id="ref-9">[9]</b> [https://github.com/bit-c/bitc](https://github.com/bit-c/bitc) bitc is a thin SPV bitcoin client 100% C code
+<b id="ref-10">[9]</b> [https://en.bitcoin.it/wiki/Bitcoin\_Core\_0.11\_(ch\_2):\_Data\_Storage#Block\_index\_.28leveldb.29](https://en.bitcoin.it/wiki/Bitcoin_Core_0.11_(ch_2):_Data_Storage#Block_index_.28leveldb.29) Block index (leveldb)
 
-<b id="ref-10">[10]</b> [https://en.bitcoin.it/wiki/Bitcoin\_Core\_0.11\_(ch\_2):\_Data\_Storage#Block\_index\_.28leveldb.29](https://en.bitcoin.it/wiki/Bitcoin_Core_0.11_(ch_2):_Data_Storage#Block_index_.28leveldb.29) Block index (leveldb)
+<b id="ref-11">[10]</b> [https://en.bitcoin.it/wiki/Bitcoin\_Core\_0.11\_(ch\_2):\_Data\_Storage#The\_UTXO\_set\_.28chainstate\_leveldb.29](https://en.bitcoin.it/wiki/Bitcoin_Core_0.11_(ch_2):_Data_Storage#The_UTXO_set_.28chainstate_leveldb.29) The UTXO set (chainstate leveldb)
 
-<b id="ref-11">[11]</b> [https://en.bitcoin.it/wiki/Bitcoin\_Core\_0.11\_(ch\_2):\_Data\_Storage#The\_UTXO\_set\_.28chainstate\_leveldb.29](https://en.bitcoin.it/wiki/Bitcoin_Core_0.11_(ch_2):_Data_Storage#The_UTXO_set_.28chainstate_leveldb.29) The UTXO set (chainstate leveldb)
+<b id="ref-12">[11]</b> [https://github.com/bitcoin/bitcoin/blob/f914f1a746d7f91951c1da262a4a749dd3ebfa71/src/chain.h#L295](https://github.com/bitcoin/bitcoin/blob/f914f1a746d7f91951c1da262a4a749dd3ebfa71/src/chain.h#L295) Bitcoin Block index SerializationOp
 
-<b id="ref-12">[12]</b> [https://github.com/bitcoin/bitcoin/blob/f914f1a746d7f91951c1da262a4a749dd3ebfa71/src/chain.h#L295](https://github.com/bitcoin/bitcoin/blob/f914f1a746d7f91951c1da262a4a749dd3ebfa71/src/chain.h#L295) Bitcoin Block index SerializationOp
+<b id="ref-13">[12]</b> [https://en.bitcoin.it/wiki/Protocol_documentation#Variable_length_integer](https://en.bitcoin.it/wiki/Protocol_documentation#Variable_length_integer) Variable length integer
 
-<b id="ref-13">[13]</b> [https://en.bitcoin.it/wiki/Protocol_documentation#Variable_length_integer](https://en.bitcoin.it/wiki/Protocol_documentation#Variable_length_integer) Variable length integer
-
-<b id="ref-14">[14]</b> 本文的 varint 的解码和编码方式如下, 如果没有特殊说明, 本文的 varint 都按下面的方式进行解码和编码.
+<b id="ref-14">[13]</b> 本文的 varint 的解码和编码方式如下, 如果没有特殊说明, 本文的 varint 都按下面的方式进行解码和编码.
 
 ```c
 size_t read_varint(const uint8_t *buf, size_t len, uint32_t *val)
@@ -585,4 +583,6 @@ size_t pack_varint(uint8_t *buf, int n)
 
 ```
 
-<b id="ref-15">[15]</b> [https://github.com/bitcoin/bitcoin/blob/d4a42334d447cad48fb3996cad0fd5c945b75571/src/coins.h#L19](https://github.com/bitcoin/bitcoin/blob/d4a42334d447cad48fb3996cad0fd5c945b75571/src/coins.h#L19)  Serialized format of UTXO
+<b id="ref-15">[14]</b> [https://github.com/bitcoin/bitcoin/blob/d4a42334d447cad48fb3996cad0fd5c945b75571/src/coins.h#L19](https://github.com/bitcoin/bitcoin/blob/d4a42334d447cad48fb3996cad0fd5c945b75571/src/coins.h#L19)  Serialized format of UTXO
+
+<b id="ref-15">[15]</b> [https://en.bitcoin.it/wiki/Protocol_rules#.22tx.22_messages](https://en.bitcoin.it/wiki/Protocol_rules#.22tx.22_messages) Tx and Block message Validation
