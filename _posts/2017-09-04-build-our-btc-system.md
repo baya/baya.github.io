@@ -505,6 +505,65 @@ raw value : 9acae02f84a810af603bc486996f273b9394ab1b308e56402d3f7171111520f9
 
 ### 1.2 以比特币为参照, 存储我们自己创建的创世区块
 
+通过程序 [wallet2.c](https://github.com/baya/mybt_coin/tree/master/wallet2.c) 封装了初始化数据库, 读取写入 block 等工作.
+
+编译运行程序:
+
+```bash
+$ make
+
+$ make wallet2
+```
+
+初始化钱包,
+
+```bash
+./wallet2.out init
+```
+
+这条命令会在当前目录下构建一个钱包, 其中 blk00000.dat 里存储着我们自己的创世区块的原始数据.
+
+```text
+my_wallet2
+└── blocks
+    ├── blk00000.dat
+    └── index
+        ├── 000005.ldb
+        ├── 000026.log
+        ├── CURRENT
+        ├── LOCK
+        ├── LOG
+        ├── LOG.old
+        └── MANIFEST-000025
+```
+
+通过 block hash 查询创世区块,
+
+```bash
+./wallet2.out getblock 0000876c9ef8c1f8b2a3012ec1bdea7296f95ae21681799f8adf967f548bf8f3
+```
+
+查询结果:
+
+```text
+wVersion: 1
+nHeight:  0
+nStatus:  24
+nTx:      1
+nFile:    0
+nDataPos: 8
+nUndoPos: 0
+Following is Block Header:
+nVersion: 1
+PrevHash : 0000000000000000000000000000000000000000000000000000000000000000
+hashMerkleRoot : b76d27da4abf50387dd70f5d6cc7e4df1d54722631cbbfdd292463df77aa0dbd
+nTime:    1504483200
+nBits:    1f00ffff
+nNonce:   65119
+```
+
+现在我们已经将我们自己的创世区块存储到了自己构建的数据库中了, 在后面我们将进行 `创建交易`, `生成新的区块` 等一系列工作.
+
 ## 2. 交易和区块的验证
 
 ## 3. P2P 网络
@@ -584,3 +643,5 @@ size_t pack_varint(uint8_t *buf, int n)
 <b id="ref-15">[14]</b> [https://github.com/bitcoin/bitcoin/blob/d4a42334d447cad48fb3996cad0fd5c945b75571/src/coins.h#L19](https://github.com/bitcoin/bitcoin/blob/d4a42334d447cad48fb3996cad0fd5c945b75571/src/coins.h#L19)  Serialized format of UTXO
 
 <b id="ref-15">[15]</b> [https://en.bitcoin.it/wiki/Protocol_rules#.22tx.22_messages](https://en.bitcoin.it/wiki/Protocol_rules#.22tx.22_messages) Tx and Block message Validation
+
+<b id="ref-16">[16]</b> [https://github.com/google/leveldb/blob/master/include/leveldb/c.h](https://github.com/google/leveldb/blob/master/include/leveldb/c.h) Leveldb C API
