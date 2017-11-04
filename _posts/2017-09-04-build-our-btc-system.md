@@ -619,27 +619,71 @@ nNonce:   65119
 
 10\.For each input, look in the main branch and the transaction pool to find the referenced output transaction. If the output transaction is missing for any input, this will be an orphan transaction. Add to the orphan transactions, if a matching transaction is not in there already.
 
+规则 9 说明了如果 input 的 output 已经被花费了，那么要拒绝这笔交易，而规则 10 表明了如果 input 对接的 output 所属的交易不存在(也可能是暂时证明不存在), 那么这笔交易要被纳入到孤交易集合(orphan transactions)中, 当然如果这笔交易已经被纳入到孤交易中去了，那么就不用做重复的纳入工作了. 如果后面能够重新找到对接的 output 所属的交易, 那么孤交易集合中的交易有可能被重新启用.
+
 11\. For each input, if the referenced output transaction is coinbase (i.e. only 1 input, with hash=0, n=-1), it must have at least COINBASE_MATURITY (100) confirmations; else reject this transaction
 
-12\. For each input, if the referenced output does not exist (e.g. never existed or has already been spent), reject this transaction[6]
+如果交易的 input 对接的 output 来自 coinbase transaction, 那么这个 coinbase transaction 必须是经过了 100 次确认才能使用, 简单的说就是这个 coinbase transaction 所在的区块上面至少要有一个 100 个区块, 比如某个 coinbase transaction 所在的区块高度是 1000, 那么要必须等到主链的高度增加到 1100 个区块后才能使用这个 coinbase transaction 里的 output.
+
+12\. For each input, if the referenced output does not exist (e.g. never existed or has already been spent), reject this transaction<sup>[[24]](#ref-24)</sup>
+
+如果交易的 input 对接的 output 已经被花费或者根本不存在, 那么拒绝这笔交易, 这条规则可以说是由规则 9 和规则 10 结合而来.
 
 13\. Using the referenced output transactions to get input values, check that each input value, as well as the sum, are in legal money range
 
-14. Reject if the sum of input values < sum of output values
+14\. Reject if the sum of input values < sum of output values
 
-15. Reject if transaction fee (defined as sum of input values minus sum of output values) would be too low to get into an empty block
+在一笔交易中，它的 input value 是它解锁的对接 output 的 value, 如果你分析过 Txin 的数据结构，你就会发现 Txin 里并没有 value 或者 amout 之类的字段, Txin 的作用就是解锁对接交易的 output, 将对接交易的 output 的 value 释放给本交易的 output. 通过下面的图我们可以更加直观地理解规则 14,
 
-16. Verify the scriptPubKey accepts for each input; reject if any are bad
+![tx-input-output](/images/tx-input-output.png)
 
-17. Add to transaction pool<sup>[[17]](#ref-17)</sup>
+比特币中的 output 只能作为一个整体被解锁，一旦被解锁，它里面的 value 会被全部释放.
 
-18. "Add to wallet if mine"
+15\. Reject if transaction fee (defined as sum of input values minus sum of output values) would be too low to get into an empty block
 
-19. Relay transaction to peers
+16\. Verify the scriptPubKey accepts for each input; reject if any are bad
 
-20. For each orphan transaction that uses this one as one of its inputs, run all these steps (including this one) recursively on that orphan
+17\. Add to transaction pool<sup>[[17]](#ref-17)</sup>
+
+18\. "Add to wallet if mine"
+
+19\. Relay transaction to peers
+
+20\. For each orphan transaction that uses this one as one of its inputs, run all these steps (including this one) recursively on that orphan
 
 ### 2.2 区块的验证规则
+
+These messages hold a single block.<sup>[[15]](#ref-15)</sup>
+
+1\. Check syntactic correctness
+
+2\. Reject if duplicate of block we have in any of the three categories
+
+3\. Transaction list must be non-empty
+
+4\. Block hash must satisfy claimed nBits proof of work
+
+5\. Block timestamp must not be more than two hours in the future
+
+6\. First transaction must be coinbase (i.e. only 1 input, with hash=0, n=-1), the rest must not be
+
+7\. For each transaction, apply "tx" checks 2-4
+
+8\. For the coinbase (first) transaction, scriptSig length must be 2-100
+
+9\. Reject if sum of transaction sig opcounts > MAX_BLOCK_SIGOPS
+
+10\. Verify Merkle hash
+
+11\. Check if prev block (matching prev hash) is in main branch or side branches. If not, add this to orphan blocks, then query peer we got this from for 1st missing orphan block in prev chain; done with block
+
+12\. Check that nBits value matches the difficulty rules
+
+13\. Reject if timestamp is the median time of the last 11 blocks or before
+
+14\. For certain old blocks (i.e. on initial block download) check that hash matches known values
+
+15\. Add block into the tree. There are three cases: 1. block further extends the main branch; 2. block extends a side branch but does not add enough difficulty to make it become the new main branch; 3. block extends a side branch and makes it the new main branch.
 
 ### 2.3 Wallet 和 Node 的交互
 
