@@ -568,25 +568,63 @@ nNonce:   65119
 
 首先我们看下 "tx" messages 的验证规则<sup>[[15]](#ref-15)</sup>,
 
-1. Check syntactic correctness
-2. Make sure neither in or out lists are empty
-3. Size in bytes <= MAX_BLOCK_SIZE
-4. Each output value, as well as the total, must be in legal money range
-5. Make sure none of the inputs have hash=0, n=-1 (coinbase transactions)
-6. Check that nLockTime <= INT_MAX[1], size in bytes >= 100[2], and sig opcount <= 2[3]
-7. Reject "nonstandard" transactions: scriptSig doing anything other than pushing numbers on the stack, or scriptPubkey not matching the two usual forms[4]
-8. Reject if we already have matching tx in the pool, or in a block in the main branch
-9. For each input, if the referenced output exists in any other tx in the pool, reject this transaction.[5]
-10.For each input, look in the main branch and the transaction pool to find the referenced output transaction. If the output transaction is missing for any input, this will be an orphan transaction. Add to the orphan transactions, if a matching transaction is not in there already.
-11. For each input, if the referenced output transaction is coinbase (i.e. only 1 input, with hash=0, n=-1), it must have at least COINBASE_MATURITY (100) confirmations; else reject this transaction
-12. For each input, if the referenced output does not exist (e.g. never existed or has already been spent), reject this transaction[6]
-13. Using the referenced output transactions to get input values, check that each input value, as well as the sum, are in legal money range
+1\. Check syntactic correctness;
+
+检查的消息语法是否正确.
+
+2\. Make sure neither in or out lists are empty;
+
+输入和输出不能为空, 也就是说当你发起一笔交易, 你必须告诉比特币网络这笔交易的钱是从哪里来的，要到哪里去.
+
+3\. Size in bytes <= MAX_BLOCK_SIZE;
+
+消息的大小不能超过区块的最大容量, 因为消息中的交易最终是要被打包到区块中, 如果一笔交易的大小超过了区块的大小也就意味着这笔交易无法被打包到交易中去了.
+目前区块的最大容量是 1M, 而基于纽约共识(New York Agreement)的比特币升级方案 SegWit2x<sup>[[18]](#ref-18)</sup> 的一项主要内容就是将区块的最大容量提升到 2M, 就是这么一个看似非常简单的扩容却要引起比特币网络的分裂, 对于我这种传统应用(中心化应用)的开发者来说这种分裂(hard fork)现象简直不可思议,
+就好像我把数据库中的某个表增加了几个字段，或者把数据库从 mongodb 迁移到了 postgresql 就会造成我的应用分裂成两个应用一样，一个应用使用 mongodb, 一个应用使用 postgresql, 然后我的用户也跟着会分成两个派别，一种支持 mongodb, 一种支持 postgresql,
+当然现实的情况是我的用户丝毫不关心我在后台使用了哪种数据库, 他们甚至可能都不知道世界上有数据库这种东西，他们只关心我的应用是否好用，是否安全稳定. 但是在比特币的世界里, 区块的大小确实是成为了一种规则，而我在 [构造比特币的创世区块](/2017/05/11/7daystalk.html) 这篇文章中
+的第一段里也提到过:
+
+> 在比特币的世界里, 规则塑造本尊，改变规则预示着分裂
+
+分裂也不是什么坏事, 物竞天择，适者生存.
+
+4\. Each output value, as well as the total, must be in legal money range;
+
+交易的输出金额和总金额应该是一个合法的值, 比如不能为 0, 不能为负数, 比特币的最小单位是 0.00000001(一亿分之1), 称为 “1聪”, 输出的金额也不应该小于 “1聪”.
+
+5\. Make sure none of the inputs have hash=0, n=-1 (coinbase transactions)
+
+"tx" message 里不能包含 coinbase 交易(即造币交易), coinbase 交易只能通过旷工挖矿生成区块时产生, 旷工可以通过广播区块，将区块中包含的 coinbase 交易广播给其他比特币节点.
+
+6\. Check that nLockTime <= INT_MAX<sup>[[19]](#ref-19)</sup>, size in bytes >= 100<sup>[[20]](#ref-20)</sup>, and sig opcount <= 2<sup>[[21]](#ref-21)</sup>
+
+
+7\. Reject "nonstandard" transactions: scriptSig doing anything other than pushing numbers on the stack, or scriptPubkey not matching the two usual forms[4]
+
+8\. Reject if we already have matching tx in the pool, or in a block in the main branch
+
+9\. For each input, if the referenced output exists in any other tx in the pool, reject this transaction.[5]
+
+10\.For each input, look in the main branch and the transaction pool to find the referenced output transaction. If the output transaction is missing for any input, this will be an orphan transaction. Add to the orphan transactions, if a matching transaction is not in there already.
+
+11\. For each input, if the referenced output transaction is coinbase (i.e. only 1 input, with hash=0, n=-1), it must have at least COINBASE_MATURITY (100) confirmations; else reject this transaction
+
+12\. For each input, if the referenced output does not exist (e.g. never existed or has already been spent), reject this transaction[6]
+
+13\. Using the referenced output transactions to get input values, check that each input value, as well as the sum, are in legal money range
+
 14. Reject if the sum of input values < sum of output values
+
 15. Reject if transaction fee (defined as sum of input values minus sum of output values) would be too low to get into an empty block
+
 16. Verify the scriptPubKey accepts for each input; reject if any are bad
+
 17. Add to transaction pool<sup>[[17]](#ref-17)</sup>
+
 18. "Add to wallet if mine"
+
 19. Relay transaction to peers
+
 20. For each orphan transaction that uses this one as one of its inputs, run all these steps (including this one) recursively on that orphan
 
 ## 3. P2P 网络
@@ -670,3 +708,12 @@ size_t pack_varint(uint8_t *buf, int n)
 <b id="ref-16">[16]</b> [https://github.com/google/leveldb/blob/master/include/leveldb/c.h](https://github.com/google/leveldb/blob/master/include/leveldb/c.h) Leveldb C API
 
 <b id="ref-17">[17]</b> Note that when the transaction is accepted into the memory pool, an additional check is made to ensure that the coinbase value does not exceed the transaction fees plus the expected BTC value (25BTC as of this writing)
+
+<b id="ref-18">[18]</b> [https://github.com/btc1/bitcoin/tree/segwit2x](https://github.com/btc1/bitcoin/tree/segwit2x)
+
+<b id="ref-19">[19]</b> nLockTime must not exceed 31 bits, as some clients will interpret it incorrectly
+
+<b id="ref-20">[20]</b>  A valid transaction requires at least 100 bytes. If it's any less, the transaction is not valid
+
+<b id="ref-21">[21]</b>  A valid transaction requires at least 100 bytes. If it's any less, the transaction is not valid
+
