@@ -568,6 +568,8 @@ nNonce:   65119
 
 首先我们看下 "tx" messages 的验证规则<sup>[[15]](#ref-15)</sup>,
 
+### 2.1 交易的验证规则
+
 1\. Check syntactic correctness;
 
 检查的消息语法是否正确.
@@ -580,7 +582,7 @@ nNonce:   65119
 
 消息的大小不能超过区块的最大容量, 因为消息中的交易最终是要被打包到区块中, 如果一笔交易的大小超过了区块的大小也就意味着这笔交易无法被打包到交易中去了.
 目前区块的最大容量是 1M, 而基于纽约共识(New York Agreement)的比特币升级方案 SegWit2x<sup>[[18]](#ref-18)</sup> 的一项主要内容就是将区块的最大容量提升到 2M, 就是这么一个看似非常简单的扩容却要引起比特币网络的分裂, 对于我这种传统应用(中心化应用)的开发者来说这种分裂(hard fork)现象简直不可思议,
-就好像我把数据库中的某个表增加了几个字段，或者把数据库从 mongodb 迁移到了 postgresql 就会造成我的应用分裂成两个应用一样，一个应用使用 mongodb, 一个应用使用 postgresql, 然后我的用户也跟着会分成两个派别，一种支持 mongodb, 一种支持 postgresql,
+就好像我把数据库中的某个表增加了几个字段，或者把数据库从 mongodb 迁移到了 postgresql 就会造成我的应用分裂成两个应用一样，一个应用使用 mongodb, 另外一个应用使用 postgresql, 然后我的用户也跟着会分成两个派别，一种支持 mongodb, 一种支持 postgresql,
 当然现实的情况是我的用户丝毫不关心我在后台使用了哪种数据库, 他们甚至可能都不知道世界上有数据库这种东西，他们只关心我的应用是否好用，是否安全稳定. 但是在比特币的世界里, 区块的大小确实是成为了一种规则，而我在 [构造比特币的创世区块](/2017/05/11/7daystalk.html) 这篇文章中
 的第一段里也提到过:
 
@@ -599,11 +601,21 @@ nNonce:   65119
 6\. Check that nLockTime <= INT_MAX<sup>[[19]](#ref-19)</sup>, size in bytes >= 100<sup>[[20]](#ref-20)</sup>, and sig opcount <= 2<sup>[[21]](#ref-21)</sup>
 
 
-7\. Reject "nonstandard" transactions: scriptSig doing anything other than pushing numbers on the stack, or scriptPubkey not matching the two usual forms[4]
+7\. Reject "nonstandard" transactions: scriptSig doing anything other than pushing numbers on the stack, or scriptPubkey not matching the two usual forms<sup>[[22]](#ref-22)</sup>
 
 8\. Reject if we already have matching tx in the pool, or in a block in the main branch
 
-9\. For each input, if the referenced output exists in any other tx in the pool, reject this transaction.[5]
+如果交易池中已经有同一笔交易了，或者区块的主链(就是最长的那条链)上有同一笔交易了，我们就拒绝这条交易.
+
+9\. For each input, if the referenced output exists in any other tx in the pool, reject this transaction.<sup>[[23]](#ref-23)</sup>
+
+简单地讲就是交易的输入不能建立在一个已经消费的输出上. 为了更直观地理解这条规则，我画了一张图, 这条规则的主要目的就是为了防御双花攻击, 当然这种防御方式是建立在 POW 的基础上的.
+
+![tx-chain](/images/simple-tx-chain.png)
+
+上图是一个简化后的交易链,虽然实际情况上一笔交易可能会有多个 input 和多个 output, 但是简化后的交易链不影响我们分析规则 9.
+
+按图中描述，如果我们要构造一笔新的交易，那么这笔新交易的 input 显然不能和 output1 对接, 因为 output1 已经被 Tx2 的 input2 所使用了, 这笔新的交易的 input 可以和 Tx2 的 output2 对接，因为 output2 没有被使用, 当然交易的构造者需要有能够解锁 output2 的私匙.
 
 10\.For each input, look in the main branch and the transaction pool to find the referenced output transaction. If the output transaction is missing for any input, this will be an orphan transaction. Add to the orphan transactions, if a matching transaction is not in there already.
 
@@ -626,6 +638,10 @@ nNonce:   65119
 19. Relay transaction to peers
 
 20. For each orphan transaction that uses this one as one of its inputs, run all these steps (including this one) recursively on that orphan
+
+### 2.2 区块的验证规则
+
+### 2.3 Wallet 和 Node 的交互
 
 ## 3. P2P 网络
 
@@ -715,5 +731,14 @@ size_t pack_varint(uint8_t *buf, int n)
 
 <b id="ref-20">[20]</b>  A valid transaction requires at least 100 bytes. If it's any less, the transaction is not valid
 
-<b id="ref-21">[21]</b>  A valid transaction requires at least 100 bytes. If it's any less, the transaction is not valid
+<b id="ref-21">[21]</b>  The number of signature operands in the signature (no, that is not redundant) for standard transactions will never exceed two
 
+<b id="ref-22">[22]</b>  Note that this is not a hard requirement on clients
+
+<b id="ref-23">[23]</b>  Note that this is not a hard requirement on clients. The network-enforced rule is that only one transaction spending a particular output can be in the blockchain, thus preventing double-spending. Technically miners can choose which one they want to put into the block they're working on as long as no other transaction has spent that output either previously in the blockchain, or in the same block. The in-memory transaction pool can technically be managed in whatever way the miner is willing to implement.
+
+<b id="ref-24">[24]</b> This is the protection against double-spending
+
+<b id="ref-25">[25]</b>  Note that when the transaction is accepted into the memory pool, an additional check is made to ensure that the coinbase value does not exceed the transaction fees plus the expected BTC value (25BTC as of this writing).
+
+<b id="ref-26">[26]</b> [https://en.wikipedia.org/wiki/Double-spending](https://en.wikipedia.org/wiki/Double-spending) Double-spending
