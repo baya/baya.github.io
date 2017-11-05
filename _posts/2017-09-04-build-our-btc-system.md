@@ -592,7 +592,7 @@ nNonce:   65119
 
 4\. Each output value, as well as the total, must be in legal money range;
 
-交易的输出金额和总金额应该是一个合法的值, 比如不能为 0, 不能为负数, 比特币的最小单位是 0.00000001(一亿分之1), 称为 “1聪”, 输出的金额也不应该小于 “1聪”.
+交易的输出金额和总金额应该是一个合法的值, 比如不能为 0, 不能为负数, 比特币的最小单位是 0.00000001(一亿分之1), 称为 “1聪”, 输出的金额也不应该小于 “1聪”, 也不能大于 2100 万个币.
 
 5\. Make sure none of the inputs have hash=0, n=-1 (coinbase transactions)
 
@@ -602,6 +602,8 @@ nNonce:   65119
 
 
 7\. Reject "nonstandard" transactions: scriptSig doing anything other than pushing numbers on the stack, or scriptPubkey not matching the two usual forms<sup>[[22]](#ref-22)</sup>
+
+scriptSig 的结构是 \<sig\> \<pubKey\>, scriptSig 的逻辑就是将 \<sig\> 和 \<pubKey\> 压入到栈中以供解锁 scriptPbkey 除此以外再无其他功能.
 
 8\. Reject if we already have matching tx in the pool, or in a block in the main branch
 
@@ -619,7 +621,7 @@ nNonce:   65119
 
 10\.For each input, look in the main branch and the transaction pool to find the referenced output transaction. If the output transaction is missing for any input, this will be an orphan transaction. Add to the orphan transactions, if a matching transaction is not in there already.
 
-规则 9 说明了如果 input 的 output 已经被花费了，那么要拒绝这笔交易，而规则 10 表明了如果 input 对接的 output 所属的交易不存在(也可能是暂时证明不存在), 那么这笔交易要被纳入到孤交易集合(orphan transactions)中, 当然如果这笔交易已经被纳入到孤交易中去了，那么就不用做重复的纳入工作了. 如果后面能够重新找到对接的 output 所属的交易, 那么孤交易集合中的交易有可能被重新启用.
+规则 9 说明了如果 input 的 output 已经被花费了，那么要拒绝这笔交易，而规则 10 表明了如果 input 对接的 output 所属的交易缺失任何一个输入, 那么这笔交易要被纳入到孤交易集合(orphan transactions)中, 当然如果这笔交易已经被纳入到孤交易中去了，那么就不用做重复的纳入工作了. 
 
 11\. For each input, if the referenced output transaction is coinbase (i.e. only 1 input, with hash=0, n=-1), it must have at least COINBASE_MATURITY (100) confirmations; else reject this transaction
 
@@ -627,9 +629,11 @@ nNonce:   65119
 
 12\. For each input, if the referenced output does not exist (e.g. never existed or has already been spent), reject this transaction<sup>[[24]](#ref-24)</sup>
 
-如果交易的 input 对接的 output 已经被花费或者根本不存在, 那么拒绝这笔交易, 这条规则可以说是由规则 9 和规则 10 结合而来.
+如果交易的 input 对接的 output 已经被花费或者根本不存在, 那么拒绝这笔交易.
 
 13\. Using the referenced output transactions to get input values, check that each input value, as well as the sum, are in legal money range
+
+和规则 14 关联起来理解, input 本身没有 value, input 通过解锁相关的 output 获得 value.
 
 14\. Reject if the sum of input values < sum of output values
 
@@ -643,11 +647,15 @@ nNonce:   65119
 
 16\. Verify the scriptPubKey accepts for each input; reject if any are bad
 
+input 中的 scriptSig 解锁对接的 output 中的 scriptPubKey, 如果无法解锁则拒绝交易.
+
 17\. Add to transaction pool<sup>[[17]](#ref-17)</sup>
 
 18\. "Add to wallet if mine"
 
 19\. Relay transaction to peers
+
+传播交易到其他节点
 
 20\. For each orphan transaction that uses this one as one of its inputs, run all these steps (including this one) recursively on that orphan
 
