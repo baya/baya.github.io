@@ -781,7 +781,8 @@ size_t pack_varint(uint8_t *buf, int n)
 
 <b id="ref-16">[16]</b> [https://github.com/google/leveldb/blob/master/include/leveldb/c.h](https://github.com/google/leveldb/blob/master/include/leveldb/c.h) Leveldb C API
 
-<b id="ref-17">[17]</b> Note that when the transaction is accepted into the memory pool, an additional check is made to ensure that the coinbase value does not exceed the transaction fees plus the expected BTC value (25BTC as of this writing)
+<b id="ref-17">[17]</b> Note that when the transaction is accepted into the memory pool, an additional check is made to ensure that the coinbase value does not exceed the transaction fees plus the expected BTC value (25BTC as of this writing);
+coinbase 交易中包含的价值应该等于挖矿产出加交易费. 挖矿产出是4年一个周期减半.
 
 <b id="ref-18">[18]</b> [https://github.com/btc1/bitcoin/tree/segwit2x](https://github.com/btc1/bitcoin/tree/segwit2x)
 
