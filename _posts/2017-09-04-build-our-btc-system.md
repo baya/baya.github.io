@@ -621,7 +621,13 @@ scriptSig 的结构是 \<sig\> \<pubKey\>, scriptSig 的逻辑就是将 \<sig\> 
 
 10\.For each input, look in the main branch and the transaction pool to find the referenced output transaction. If the output transaction is missing for any input, this will be an orphan transaction. Add to the orphan transactions, if a matching transaction is not in there already.
 
-规则 9 说明了如果 input 的 output 已经被花费了，那么要拒绝这笔交易，而规则 10 表明了如果 input 对接的 output 所属的交易缺失任何一个输入, 那么这笔交易要被纳入到孤交易集合(orphan transactions)中, 当然如果这笔交易已经被纳入到孤交易中去了，那么就不用做重复的纳入工作了. 
+如果交易的 input 对接的 output 所属的交易缺失任何一个输入, 那么这笔交易要被纳入到孤交易集合(orphan transactions)中, 当然如果这笔交易已经被纳入到孤交易中去了，那么就不用做重复的纳入工作了. 
+
+为什么会有孤交易这种奇怪的东西出现呢？ 让我们通过一张图来了解这一现象,
+
+![orphan-tx.png](/images/orphan-tx.png)
+
+如果有恶意的用户伪造大量的,恶意的,根本没有父交易的孤交易来攻击节点, 这种攻击可能会导致节点瘫痪, 所以节点会限制孤交易池的大小, 并且会清理过期的孤交易.
 
 11\. For each input, if the referenced output transaction is coinbase (i.e. only 1 input, with hash=0, n=-1), it must have at least COINBASE_MATURITY (100) confirmations; else reject this transaction
 
