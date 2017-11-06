@@ -701,6 +701,10 @@ These messages hold a single block.<sup>[[15]](#ref-15)</sup>
 
 ### 2.3 Wallet 和 Node 的交互
 
+#### 2.3.1 为 Alice 和 Bob 创建钱包(Wallet)
+
+#### 2.3.2 加入旷工节点(Node)
+
 ## 3. P2P 网络
 
 ## 4. 参考资料
