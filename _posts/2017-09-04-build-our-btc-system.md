@@ -699,11 +699,77 @@ These messages hold a single block.<sup>[[15]](#ref-15)</sup>
 
 15\. Add block into the tree. There are three cases: 1. block further extends the main branch; 2. block extends a side branch but does not add enough difficulty to make it become the new main branch; 3. block extends a side branch and makes it the new main branch.
 
+16\. For case 1, adding to main branch:
+
+```
+1. For all but the coinbase transaction, apply the following:
+
+	1. For each input, look in the main branch to find the referenced output transaction. Reject if the output transaction is missing for any input.
+
+	2. For each input, if we are using the nth output of the earlier transaction, but it has fewer than n+1 outputs, reject.
+
+	3. For each input, if the referenced output transaction is coinbase (i.e. only 1 input, with hash=0, n=-1), it must have at least COINBASE_MATURITY (100) confirmations; else reject.
+
+	4. Verify crypto signatures for each input; reject if any are bad
+
+	5. For each input, if the referenced output has already been spent by a transaction in the main branch, reject
+	6. Using the referenced output transactions to get input values, check that each input value, as well as the sum, are in legal money range
+
+	7. Reject if the sum of input values < sum of output values
+   
+2. Reject if coinbase value > sum of block creation fee and transaction fees
+3. (If we have not rejected):
+4. For each transaction, "Add to wallet if mine"
+5. For each transaction in the block, delete any matching transaction from the transaction pool
+6. Relay block to our peers
+7. If we rejected, the block is not counted as part of the main branch
+
+```
+
+17\. For case 2, adding to a side branch, we don't do anything.
+
+18\. For case 3, a side branch becoming the main branch:
+
+```
+1. Find the fork block on the main branch which this side branch forks off of
+2. Redefine the main branch to only go up to this fork block
+3. For each block on the side branch, from the child of the fork block to the leaf, add to the main branch:
+   1. Do "branch" checks 3-11
+   2. For all but the coinbase transaction, apply the following:
+	  1. For each input, look in the main branch to find the referenced output transaction. Reject if the output transaction is missing for any input.
+	  2. For each input, if we are using the nth output of the earlier transaction, but it has fewer than n+1 outputs, reject.
+	  3. For each input, if the referenced output transaction is coinbase (i.e. only 1 input, with hash=0, n=-1), it must have at least COINBASE_MATURITY (100) confirmations; else reject.
+	  4. Verify crypto signatures for each input; reject if any are bad
+	  5. For each input, if the referenced output has already been spent by a transaction in the main branch, reject
+	  6. Using the referenced output transactions to get input values, check that each input value, as well as the sum, are in legal money range
+	  7. Reject if the sum of input values < sum of output values
+   3. Reject if coinbase value > sum of block creation fee and transaction fees
+   4. (If we have not rejected):
+   5. For each transaction, "Add to wallet if mine"
+   
+4. If we reject at any point, leave the main branch as what it was originally, done with block
+5. For each block in the old main branch, from the leaf down to the child of the fork block:   
+   1. For each non-coinbase transaction in the block:
+	  1. Apply "tx" checks 2-9, except in step 8, only look in the transaction pool for duplicates, not the main branch
+	  2. Add to transaction pool if accepted, else go on to next transaction
+6. For each block in the new main branch, from the child of the fork node to the leaf:
+   1. For each transaction in the block, delete any matching transaction from the transaction pool
+   
+7. For each transaction in the block, delete any matching transaction from the transaction pool
+	  
+```
+
+19\. For each orphan block for which this block is its prev, run all these steps (including this one) recursively on that orphan
+
+
+
 ### 2.3 Wallet 和 Node 的交互
 
-#### 2.3.1 为 Alice 和 Bob 创建钱包(Wallet)
+#### 2.3.1 分别为 Alice 和 Bob 创建钱包(Wallet)
 
 #### 2.3.2 加入旷工节点(Node)
+
+#### 2.3.3 燥起来
 
 ## 3. P2P 网络
 
