@@ -671,15 +671,23 @@ These messages hold a single block.<sup>[[15]](#ref-15)</sup>
 
 1\. Check syntactic correctness
 
-2\. Reject if duplicate of block we have in any of the three categories
+2\. Reject if duplicate of block we have in any of the three categories<sup>[[27]](#ref-27)</sup>
+
+the three categories, 表示的 3 种类型是: `blocks in the main branch`, `blocks on side branches off the main branch`, `orphan blocks`
+
+![主链侧链孤链示意图](/images/msochain.png)
 
 3\. Transaction list must be non-empty
 
 4\. Block hash must satisfy claimed nBits proof of work
 
+block hash 前面的 0 的个数需要和 block header 中的 Bits 字段相匹配，从而通过工作量的证明.
+
 5\. Block timestamp must not be more than two hours in the future
 
 6\. First transaction must be coinbase (i.e. only 1 input, with hash=0, n=-1), the rest must not be
+
+区块中的第一交易必须为 coinbase 交易，并且只包含一笔 coinbase 交易.
 
 7\. For each transaction, apply "tx" checks 2-4
 
@@ -697,7 +705,7 @@ These messages hold a single block.<sup>[[15]](#ref-15)</sup>
 
 14\. For certain old blocks (i.e. on initial block download) check that hash matches known values
 
-15\. Add block into the tree. There are three cases: 1. block further extends the main branch; 2. block extends a side branch but does not add enough difficulty to make it become the new main branch; 3. block extends a side branch and makes it the new main branch.
+15\. Add block into the tree. There are three cases: 1. block further extends the main branch; 2. block extends a side branch but does not add enough difficulty to make it become the new main branch; 3. block extends a side branch and makes it the new main branch. 
 
 16\. For case 1, adding to main branch:
 
@@ -755,12 +763,11 @@ These messages hold a single block.<sup>[[15]](#ref-15)</sup>
 6. For each block in the new main branch, from the child of the fork node to the leaf:
    1. For each transaction in the block, delete any matching transaction from the transaction pool
    
-7. For each transaction in the block, delete any matching transaction from the transaction pool
+7. Relay block to our peers
 	  
 ```
 
 19\. For each orphan block for which this block is its prev, run all these steps (including this one) recursively on that orphan
-
 
 
 ### 2.3 Wallet 和 Node 的交互
@@ -769,7 +776,7 @@ These messages hold a single block.<sup>[[15]](#ref-15)</sup>
 
 #### 2.3.2 加入旷工节点(Node)
 
-#### 2.3.3 燥起来
+#### 2.3.3 气氛燥起来
 
 ## 3. P2P 网络
 
@@ -871,3 +878,18 @@ coinbase 交易中包含的价值应该等于挖矿产出加交易费. 挖矿产
 <b id="ref-25">[25]</b>  Note that when the transaction is accepted into the memory pool, an additional check is made to ensure that the coinbase value does not exceed the transaction fees plus the expected BTC value (25BTC as of this writing).
 
 <b id="ref-26">[26]</b> [https://en.wikipedia.org/wiki/Double-spending](https://en.wikipedia.org/wiki/Double-spending) Double-spending
+
+<b id="ref-27">[27]</b> There are 3 categories of blocks:
+
+```
+blocks in the main branch:
+	the transactions in these blocks are considered at least tentatively confirmed
+
+blocks on side branches off the main branch:
+	these blocks have at least tentatively lost the race to be in the main branch
+
+orphan blocks:
+	these are blocks which don't link into the main branch, normally because of a missing predecessor or nth-level predecessor
+
+Blocks in the first two categories form a tree rooted at the genesis block, linked by the prev pointer, which points toward the root. (It is a very linear tree with few and short branches off the main branch.) The main branch is defined as the branch with highest total difficulty, summing the difficulties for each block in the branch.
+```
