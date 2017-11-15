@@ -772,11 +772,9 @@ block hash 前面的 0 的个数需要和 block header 中的 Bits 字段相匹�
 
 ### 2.3 Wallet 和 Node 的交互
 
-#### 2.3.1 分别为 Alice 和 Bob 创建钱包(Wallet)
+#### 2.3.1 加入旷工节点(Node)
 
-#### 2.3.2 加入旷工节点(Node)
-
-#### 2.3.3 气氛燥起来
+#### 2.3.2 分别为 Alice 和 Bob 创建钱包(Wallet)
 
 ## 3. P2P 网络
 
@@ -893,3 +891,44 @@ orphan blocks:
 
 Blocks in the first two categories form a tree rooted at the genesis block, linked by the prev pointer, which points toward the root. (It is a very linear tree with few and short branches off the main branch.) The main branch is defined as the branch with highest total difficulty, summing the difficulties for each block in the branch.
 ```
+
+<b id="ref-28">[28]</b> [https://github.com/bitcoinbook/bitcoinbook/blob/second_edition/ch04.asciidoc#base58check_encoding](https://github.com/bitcoinbook/bitcoinbook/blob/second_edition/ch04.asciidoc#base58check_encoding) Base58Check Encoding
+
+![Base58 Check](/images/base58_check.png)
+
+
+Base58Check version prefix and encoded result examples
+
+|Type| Version prefix (hex)| Base58 result prefix|
+|----|---------------------|---------------------|
+| Bitcoin Address | 0x00 | 1 |
+| Pay-to-Script-Hash Address | 0x05 | 3 |
+| Bitcoin Testnet Address | 0x6F | m or n| 
+| Private Key WIF |  0x80 | 5, K, or L |
+| BIP-38 Encrypted Private Key | 0x0142 | 6P |
+| BIP-32 Extended Public Key | 0x0488B21E | xpub  |
+
+<br>
+
+Private key representations (encoding formats)
+
+|Type|Prefix|Description|
+|----|------|-----------|
+| Raw | None | 32 bytes |
+| Hex | None | 64 hexadecimal digits|
+| WIF |  5 | Base58Check encoding: Base58 with version prefix of 128- and 32-bit checksum|
+| WIF-compressed | K or L | As above, with added suffix 0x01 before encoding|
+
+<br>
+
+Example: Same key, different formats
+
+|Format | Private key|
+|-------|------------|
+| Hex | 1e99423a4ed27608a15a2616a2b0e9e52ced330ac530edcc32c8ffc6a526aedd |
+| WIF | 5J3mBbAH58CpQ3Y5RNJpUKPE62SQ5tfcvU2JpbnkeyhfsYB1Jcn |
+| WIF-compressed | KxFC1jmwwCoACiCAWZ3eXa96mBM6tb3TYzGmf6YwgdGWZgawvrtJ |
+
+关于 WIF 和 WIF-compressed 的实现细节可以参考测试代码 [kyk_base58.c]() 中的 `kyk_base58check` 函数, 相关的测试可以查看 [kyk_base58_tests.c]()
+
+
