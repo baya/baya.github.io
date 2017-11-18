@@ -929,6 +929,6 @@ Example: Same key, different formats
 | WIF | 5J3mBbAH58CpQ3Y5RNJpUKPE62SQ5tfcvU2JpbnkeyhfsYB1Jcn |
 | WIF-compressed | KxFC1jmwwCoACiCAWZ3eXa96mBM6tb3TYzGmf6YwgdGWZgawvrtJ |
 
-关于 WIF 和 WIF-compressed 的实现细节可以参考文件 [kyk_base58.c]() 中的 `kyk_base58check` 函数, 相关的测试可以查看 [kyk_base58_tests.c]()
+关于 WIF 和 WIF-compressed 的实现细节可以参考文件 [kyk_base58.c](https://github.com/baya/mybt_coin/tree/master/src/kyk_base58.c) 中的 `kyk_base58check` 函数, 相关的测试可以查看 [kyk_base58_tests.c](https://github.com/baya/mybt_coin/tree/master/tests/kyk_base58_tests.c)
 
 
