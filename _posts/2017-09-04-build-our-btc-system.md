@@ -931,4 +931,11 @@ Example: Same key, different formats
 
 关于 WIF 和 WIF-compressed 的实现细节可以参考文件 [kyk_base58.c](https://github.com/baya/mybt_coin/tree/master/src/kyk_base58.c) 中的 `kyk_base58check` 函数, 相关的测试可以查看 [kyk_base58_tests.c](https://github.com/baya/mybt_coin/tree/master/tests/kyk_base58_tests.c)
 
+<b id="ref-29">[29]</b> [https://bitcoin.stackexchange.com/questions/3059/what-is-a-compressed-bitcoin-key](https://bitcoin.stackexchange.com/questions/3059/what-is-a-compressed-bitcoin-key) What is a compressed Bitcoin key?
 
+```
+A compressed key is just a way of storing a public key in fewer bytes (33 instead of 65).
+There are no compatibility or security issues because they are precisely the same keys, just stored in a different way. 
+```
+
+关于 compressed key 和 uncompressed key 等效性的相关测试请查看 [ecdsa_tests.c](https://github.com/baya/mybt_coin/tree/master/tests/ecdsa_tests.c)
