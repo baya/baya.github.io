@@ -938,4 +938,4 @@ A compressed key is just a way of storing a public key in fewer bytes (33 instea
 There are no compatibility or security issues because they are precisely the same keys, just stored in a different way. 
 ```
 
-关于 compressed key 和 uncompressed key 等效性的相关测试请查看 [ecdsa_tests.c](https://github.com/baya/mybt_coin/tree/master/tests/ecdsa_tests.c)
+关于 compressed key 和 uncompressed key 等效性的相关测试请查看 [ecdsa_tests.c](https://github.com/baya/mybt_coin/tree/master/tests/ecdsa_tests.c) 中的 `test_kyk_ec_sig_verify()` 测试.
