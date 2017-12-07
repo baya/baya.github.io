@@ -666,9 +666,9 @@ block hash 前面的 0 的个数需要和 block header 中的 Bits 字段相匹�
 
 比特币网络每生成 2016 个 block 时就会对全网的 hash 算力进行一次评估，并根据评估结果对全网的 Difficulty<sup>[[29]](#ref-29)</sup> 进行调整, 调整的结果可能是增大难度，减小难度，或者保持难度不变. 难度和 hash 运算的次数之间有一个公式:
 
-> Total / (difficulty_1_target / D) 
+> HashNum = Total / (difficulty_1_target / D) 
 
-`Total` 表示全体可能均匀出现的数字的数量, `difficulty_1_target` 表示难度为 1 的 target, target 是一个小于 `Total` 的数字, `D` 表示难度.
+`HashNum` 表示运行 hash 计算的次数, `Total` 表示所有的均匀出现的数字的数量, `difficulty_1_target` 表示难度为 1 的 target, target 是一个小于 `Total` 的数字, `D` 表示难度.
 
 还以骰子为例, 假设我们有一个包含从 0 ~ 999 的数字的骰子, 此时的 `Total` 是 1000, 抛掷骰子时，每个数字出现的几率是相等的都是千分之一, 我们设定 `difficulty_1_target` 为 800, 那么抛出一个数小于 800 的概率是 `800/1000`, 在概率上是要抛 `1000/800` 次骰子才能得到一个小于 800 的数字, 如果我们提升难度为 10, 
 
@@ -676,23 +676,85 @@ block hash 前面的 0 的个数需要和 block header 中的 Bits 字段相匹�
 
 公式 `Total / (difficulty_1_target / D) ` 的简化形式如下:
 
-> D * Total / difficulty_1_target
+> HashNum = D * Total / difficulty_1_target
 
 在比特币网络中, `Total = 2**256`, `difficulty_1_target = 0xffff * 2**208`, 于是这个公式变成了 `D * 2**48 / 0xffff`, 这个公式的意思是: 在难度为 D 的条件下, 在概率上, 比特币网络需要要进行 `D * 2**48 / 0xffff` 次 hash 运算才能算出一个满足难度 D 的 block. 比特币网络的标准出块时间是 10 分钟,
 
 那么比特币网络在难度 D 下的标准算力即为: `D * 2**48 / 0xffff / 600` = `D * 2**32 / 600`. 现在我们可以得到另外一个公式:
 
-通过算力可以推算出 D, 其中 H 表示每秒进行 hash 运算的次数,
+其中 H 表示每秒进行 hash 运算的次数,
 
 > D = H * 600 / 2 ** 32
 
-于是调整难度的关键就变成了如何计算出 H, 我们知道比特币网络是每 2016 个区块调整次算力, 在前 2016 个区块段, 难度是已知的, 生成 2016 个区块所花费的总时间也是已知的，那么可以通过下面的公式评估出当前网络的算力,
+于是调整难度的关键就变成了如何计算出 H, 我们知道比特币网络是每 2016 个区块评估一次算力, 在前 2016 个区块段中, 难度是已知的, 生成 2016 个区块所花费的总时间也是已知的，那么可以通过下面的公式评估出当前网络的算力,
 
-> H = D * 2**32 * 2016 / T
+> H = pervD * 2**32 * 2016 / T
 
-其中 D 表示前 2016 个区块的难度(这 2016 个区块的难度是一样的), T 表示生成 2016 个区块总共花的时间, 这样我们就算出了 H, 然后把 H 代入到公式 `D = H * 600 / 2 ** 32` 中就可以计算出当前网络需要的难度 D.
+其中 prevD 表示前 2016 个区块的难度(这 2016 个区块的难度是一样的), T 表示生成 2016 个区块总共花的时间这个也是以知的, 这样我们就算出了 H, 然后把 H 代入到公式 `D = H * 600 / 2 ** 32` 中就可以计算出当前网络需要调整到的难度 D, 这时计算 D 的公式可以变为:
 
-当然我们需要通过自己写代码对比特币网络的历史难度进行验证，看是否符合自己的推算. 这里有一份比特币网络的难度调整历史数据<sup>[[30]](#ref-30)</sup>, 我将其迁移到本文以供查阅和备份.
+> D = prevD * 2016 * 600 / T
+
+公式左右两边同时被 difficulty\_1\_target 除就变为了,
+
+>  difficulty_1_target / D = (difficulty_1_target * T )/ (prevD * 2016 * 600)
+
+>  NextTarget = (PrevTarget * T) / (2016 * 600)
+
+其中 NextTarget = difficulty\_1\_target / D, PrevTarget = difficulty\_1\_target / prevD, 我们可以查看 bitcoin 的源码验证我们的求导结果和 bitcoin 是一致的,
+
+[https://github.com/bitcoin/bitcoin/blob/master/src/pow.cpp#L49](https://github.com/bitcoin/bitcoin/blob/master/src/pow.cpp#L49)
+
+```c++
+
+unsigned int CalculateNextWorkRequired(const CBlockIndex* pindexLast, int64_t nFirstBlockTime, const Consensus::Params& params)
+{
+    if (params.fPowNoRetargeting)
+        return pindexLast->nBits;
+
+    // Limit adjustment step
+    int64_t nActualTimespan = pindexLast->GetBlockTime() - nFirstBlockTime;
+    if (nActualTimespan < params.nPowTargetTimespan/4)
+        nActualTimespan = params.nPowTargetTimespan/4;
+    if (nActualTimespan > params.nPowTargetTimespan*4)
+        nActualTimespan = params.nPowTargetTimespan*4;
+
+    // Retarget
+    const arith_uint256 bnPowLimit = UintToArith256(params.powLimit);
+    arith_uint256 bnNew;
+    bnNew.SetCompact(pindexLast->nBits);
+    bnNew *= nActualTimespan;
+    bnNew /= params.nPowTargetTimespan;
+
+    if (bnNew > bnPowLimit)
+        bnNew = bnPowLimit;
+
+    return bnNew.GetCompact();
+}
+```
+
+在 bitcoin 的源码中对 `T` 进行了处理, 其中的 `nActualTimespan` 即表示  `NextTarget = (PrevTarget * T) / (2016 * 600)` 中的 `T`,
+
+```c++
+
+if (nActualTimespan < params.nPowTargetTimespan/4)
+	nActualTimespan = params.nPowTargetTimespan/4;
+if (nActualTimespan > params.nPowTargetTimespan*4)
+	nActualTimespan = params.nPowTargetTimespan*4;
+
+```
+
+```c++
+// Retarget
+const arith_uint256 bnPowLimit = UintToArith256(params.powLimit);
+arith_uint256 bnNew;
+bnNew.SetCompact(pindexLast->nBits);
+bnNew *= nActualTimespan;
+bnNew /= params.nPowTargetTimespan;
+```
+
+这里 `bnNew * nActualTimespan / params.nPowTargetTimespan` 算出的就是新的 2016 个区块的 target, 这个和 `NextTarget = (PrevTarget * T) / (2016 * 600)` 效果是一致的.
+
+这里有一份比特币网络的难度调整历史数据<sup>[[30]](#ref-30)</sup>, 我将其迁移到本文以供查阅, 并使用其中的数据对自己的难度调整代码进行测试.
 
 #### 2.3.2 加入旷工节点(Node)
 
