@@ -754,8 +754,6 @@ bnNew /= params.nPowTargetTimespan;
 
 这里 `bnNew * nActualTimespan / params.nPowTargetTimespan` 算出的就是新的 2016 个区块的 target, 这个和 `NextTarget = (PrevTarget * T) / (2016 * 600)` 效果是一致的.
 
-这里有一份比特币网络的难度调整历史数据<sup>[[30]](#ref-30)</sup>, 我将其迁移到本文以供查阅, 并使用其中的数据对自己的难度调整代码进行测试.
-
 #### 2.3.2 加入旷工节点(Node)
 
 #### 2.3.3 分别为 Alice 和 Bob 创建钱包(Wallet)
