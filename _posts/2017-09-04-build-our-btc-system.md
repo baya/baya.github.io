@@ -7,6 +7,8 @@ title: 区块链技术探索(二), 打造我们自己的比特币
 
 Talk is cheap, show me the code, 让我们从最简单的地方出发: 模仿中本聪的比特币.
 
+项目的代码在 [https://github.com/baya/mybt_coin](https://github.com/baya/mybt_coin)
+
 ## 1. 区块链的存储
 
 在 [构造比特币的创世区块](/2017/05/11/7daystalk.html) 这篇文章中我们把生成的创世区块写到了一个叫 kyk-gens-block.dat 的文件中，这时候我们已经初步完成区块链的存储, 现在我们要为其加上索引, 在比特币的世界里, 使用了 [LevelDB](https://github.com/google/leveldb)<sup>[[1]](#ref-1)</sup> 来存储这些索引, 设计索引是一件比较精巧细致的活, 我们可以参考 [Bitcoin Core Data Storage](https://en.bitcoin.it/wiki/Bitcoin_Core_0.11_(ch_2):_Data_Storage)<sup>[[2]](#ref-2)</sup> 用自己的代码来一步步实现索引.
@@ -660,7 +662,7 @@ block hash 前面的 0 的个数需要和 block header 中的 Bits 字段相匹�
 19\. For each orphan block for which this block is its prev, run all these steps (including this one) recursively on that orphan
 
 
-### 2.3 Wallet 和 Node 的交互
+### 2.3 实现矿工节点
 
 #### 2.3.1 比特币网络的难度调整算法(Difficulty Adjustment)
 
@@ -754,13 +756,81 @@ bnNew /= params.nPowTargetTimespan;
 
 这里 `bnNew * nActualTimespan / params.nPowTargetTimespan` 算出的就是新的 2016 个区块的 target, 这个和 `NextTarget = (PrevTarget * T) / (2016 * 600)` 效果是一致的.
 
-#### 2.3.2 加入旷工节点(Node)
+#### 2.3.2 实验矿工节点
 
-#### 2.3.3 分别为 Alice 和 Bob 创建钱包(Wallet)
+```
+$ make
 
-## 3. P2P 网络
+$ make kyk_miner
 
-## 4. 参考资料
+$ ./kyk_miner.out             # 查看支持的命令
+
+$ ./kyk_miner.out init        # 初始化矿工
+
+$ ./kyk_miner.out makeBlock   # 生产一个区块, 这个区块包含 100 BTC, 并且只包含一笔 coinbase 交易, 即矿工给自己增加 100 个BTC, 真实的 BTC 网络在后期是不允许这样操作的
+
+输出: maked a new block: 0000f5e6d8700e78989ac97ac12a0c6f216e5ad42a7008ec22298f1d997abe63
+
+$ ./kyk_miner.out queryBlance # 查询拥有的 BTC 数量
+输出: 100.000000 BTC
+
+$ ./kyk_miner.out queryBlock 0000f5e6d8700e78989ac97ac12a0c6f216e5ad42a7008ec22298f1d997abe63  # 查询 block 数据
+
+输出:
+wVersion: 1
+nHeight:  0
+nStatus:  24
+nTx:      1
+nFile:    0
+nDataPos: 242
+nUndoPos: 0
+Following is Block Header:
+nVersion: 1
+PrevHash : 0000876c9ef8c1f8b2a3012ec1bdea7296f95ae21681799f8adf967f548bf8f3
+hashMerkleRoot : 0b527174947e9d808c3d4d2dbf1780be764a53ce22fbc09d124f0e4a02686d43
+nTime:    1514128378
+nBits:    1f00ffff
+nNonce:   64368
+
+$ ./kyk_miner.out makeTx 8 invalidaddress                     # 向非法地址转账失败
+
+$ ./kyk_miner.out makeTx 8 1KAWPAD8KovUo53pqHUY2bLNMTYa1obFX9 # 向正常的地址转账成功
+
+$ ./kyk_miner.out queryBalance                                # 查询余额, 因为每当生成一笔交易时，矿工都会创建一个新的 block, 增加 100 BTC, 无矿工费用, 矿工费用可以在 src/kyk_defs.h 文件中设置
+
+输出:
+192.000000 BTC
+
+$ ./kyk_miner.out addAddress "a2"                             # 增加一个 label 为 "a2" 的地址
+
+输出:
+Added a new address: 13dqX7yNia35V2dZkM5dMyTExocyPTAbAT
+
+$ ./kyk_miner.out showAddrList                                # 显示矿工当前拥有的地址
+
+输出:
+1GkfyvQod8Bj4nFTrTejdr64kMprqTFSgb
+13dqX7yNia35V2dZkM5dMyTExocyPTAbAT
+
+$ ./kyk_miner.out makeTx 9 13dqX7yNia35V2dZkM5dMyTExocyPTAbAT  # 矿工给自己控制的地址发送 9 个比特币, 结果是增加 100 个比特币
+
+./kyk_miner.out queryBalance                          
+
+输出:
+292.000000 BTC
+
+
+$ ./kyk_miner.out serve 8333                                  # 启动服务
+
+```
+
+如果陷入了困境，可以删除矿工，重新开始:
+
+```
+$ ./kyk_miner.out delete
+```
+
+## 3. 参考资料
 
 <b id="ref-1">[1]</b> [https://bitcoin.stackexchange.com/questions/28168/what-are-the-keys-used-in-the-blockchain-leveldb-ie-what-are-the-keyvalue-pair](https://bitcoin.stackexchange.com/questions/28168/what-are-the-keys-used-in-the-blockchain-leveldb-ie-what-are-the-keyvalue-pair) What are the keys used in the blockchain levelDB?
 
@@ -925,3 +995,5 @@ There are no compatibility or security issues because they are precisely the sam
 <b id="ref-29">[29]</b> [https://en.bitcoin.it/wiki/Difficulty](https://en.bitcoin.it/wiki/Difficulty) Difficulty
 
 <b id="ref-30">[30]</b> [https://docs.google.com/spreadsheets/d/1DQYQOLsB-pJWGu5e8CXF4vkxdYHEJDOyxQptBmC_030/edit#gid=0](https://docs.google.com/spreadsheets/d/1DQYQOLsB-pJWGu5e8CXF4vkxdYHEJDOyxQptBmC_030/edit#gid=0) Bitcoin Difficulty Adjustments Data Table
+
+<b id="ref-31">[31]</b> [https://en.wikipedia.org/wiki/Bloom_filter](https://en.wikipedia.org/wiki/Bloom_filter) Bloom 过滤器
