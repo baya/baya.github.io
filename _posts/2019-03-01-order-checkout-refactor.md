@@ -19,3 +19,100 @@ title: 订单流程重构记
 ```
 
 - 问题 2, 前端页面和 rails 后台程序的交互过程中没有使用标准且一致的数据结构
+
+![checkout flows](/images/checkout_flows.png)
+
+从上图我们可以看到整个的 checkout 逻辑被切割的支离破碎, 无论是 rails 后台程序这边还是前端页面逻辑都需要花费很多心力去维护.
+
+重构的目的就是为了解决上面的两个问题,
+
+我们建立一个标准的 checkout payload 模型用于前端和后端程序的交互, 将分散凌乱的 endpoint 规整为一个 checkout endpoint.
+
+在前端页面上，我们埋入一个隐藏的 form 表单,
+
+```erb
+<% url    ||= '' %>
+<% verb   ||= 'POST' %>
+<% target ||= 'order' %>
+<% url_for_place_order ||= '' %>
+<% request_ajax ||= false %>
+<%= form_tag url, id: 'backendCheckoutForm', class: 'hidden', method: verb, "data-url-for-place-order" => url_for_place_order, "data-request-ajax" => request_ajax do %>
+  <%= text_field_tag "target", target %>
+  <%= text_field_tag "event", event %>
+  <%= text_area_tag "checkoutData", entity.to_json %>
+<% end %>
+```
+
+将 checkout payload 以 json 字符串的形式存储在 name 为 checkoutData 的 textarea 中, 当用户操作 checkout 的时候，会将 textarea 里的 json 字符串取出，转换为 js object, 我们把这个 js object 叫为 entity,
+
+```javascript
+
+function getEntityFromBackendForm() {
+    var $ck = $('#checkoutData');
+
+    if(!$ck[0]){
+        return {};
+    }
+
+    var ckVal = $ck.val();
+
+    if (ckVal) {
+        entity = JSON.parse(ckVal);
+    } else {
+        entity = {};
+    }
+
+    return entity;
+}
+
+``` 
+
+用户在页面上的操作一旦涉及到数据的改变，我们会更新 entity 对应的数据，然后再将 entity 重新放入到 checkoutData textarea 中,
+
+```javascript
+function setEntityToBackendForm(entity) {
+    var $ck = $('#checkoutData');
+
+    if(!$ck[0]){
+        return;
+    }
+    var res = JSON.stringify(entity);
+
+    $ck.val(res);
+}
+```
+
+最后以 form 表单的形式将 entity 提交给 checkout point,
+
+```javascript
+function submitBackendForm() {
+    var $form = $('#backendCheckoutForm');
+    $form.submit();
+}
+```
+
+在 rails 后台程序这边，只需要处理页面传过来的 entity, 对应的更新页面即可:
+
+```ruby
+
+def checkout
+
+    if params[:checkoutData].present?
+      data = params[:checkoutData]
+      data = JSON.parse(data)
+      
+      checkout_service(data)
+
+    end
+
+  end
+```
+
+这样以前分散凌乱的逻辑就抽象为了标准一致的逻辑了，重构后都流程图:
+
+![standard checkout](/images/standard_checkout.png)
+
+从上图中我们可以发现, checkout 的业务简化为了: 用户操作 -> 引起 checkout entity 的更新 -> 将 checkout entity 提交给 checkout endpoint 处理.
+
+
+
