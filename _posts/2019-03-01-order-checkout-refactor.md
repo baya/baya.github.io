@@ -82,7 +82,7 @@ function setEntityToBackendForm(entity) {
 }
 ```
 
-最后以 form 表单的形式将 entity 提交给 checkout point,
+最后以 form 表单的形式将 entity 提交给 checkout endpoint,
 
 ```javascript
 function submitBackendForm() {
