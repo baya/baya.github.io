@@ -10,8 +10,8 @@ title: 订单流程重构记
 首先说下我们遇到的问题, 我们的系统是用 Rails 开发的, 前端用的 js 库是 jQuery
 - 问题 1, 为了实现 order checkout 这一个业务, 我们使用了过多的 controller 和 action
 
-	比如说为了实现切换 shpping method 的逻辑，我们使用了单独的 action 去专门处理这一逻辑，前端操作之后，会把新的 shipping method id 和页面上的其它数据拼凑起来发给 action, 然后在 action 里返回新的数据给前端, 前端再用新的数据更新页面，一般会更新shipping fee, order total, 如果有 pickup location 返回还需要更新 pickup location.
-	其它的操作比如使用礼品券，电子钱包，切换 payment method, 都建立了相应的 controller 和 action, 这样带来的后果是在 rails 这边我们要维护很多的 controller 和 action, 同时在页面这端我们要维护很多的 url, 比如我们几乎会在每一个可操作的元素上使用 data-url 来绑定对应的 url, 类似下面:
+	比如说为了实现切换 shpping method 的逻辑，我们使用了单独的 action 去专门处理这一逻辑，前端操作之后，会把新的 shipping method id 和页面上的其它数据拼凑起来发给 action, 然后在 action 里返回新的数据给前端, 前端再用新的数据更新页面，一般来说会更新shipping fee, order total 等数据, 如果返回了 pickup location 还需要更新 pickup location.
+	其它的操作比如使用礼品券，电子钱包，切换 payment method, 也都建立了相应的 controller 和 action, 这样带来的后果是在 rails 这边我们要维护很多的 controller 和 action, 同时在页面这端我们也要维护很多的 url, 比如我们几乎会在每一个可操作的元素上使用 data-url 来绑定对应的 url, 类似下面:
 	
 ```html
 	<div class="shippingMethodItem" data-url="/order/shipping_method_checkout">...</div>
