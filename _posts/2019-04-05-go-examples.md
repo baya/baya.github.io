@@ -16,10 +16,7 @@ export GOPROXY=https://goproxy.io
 
 ## 数据库
 
-#### postgresql
 [使用 pq 操作 postgresql 数据库](https://github.com/baya/go-examples/blob/master/pg_example.go)
-
-#### mongodb
 
 [使用 mongo-driver ](https://github.com/baya/go-examples/blob/master/mongodb_example.go)
 
