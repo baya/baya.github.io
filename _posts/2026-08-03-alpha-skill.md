@@ -22,6 +22,10 @@ title: Alpha Skill：我做的一个 side project
 
 ![Alpha Skill Params2UI 表单界面](/images/alpha-skill/params2ui.png)
 
+生成完直接就是一个独立可用的页面，同样的表单，脱离了 Studio 也能单独打开：
+
+![独立部署的图表型态分析 Skill 页面](/images/alpha-skill/standalone-app.png)
+
 股票代码、分析周期、分析重点直接选，选完点“开始分析”，比在 Chat 里一句一句描述省心太多。更有意思的是这个 UI 本身也是可以对话着改的，比如我在 Chat 里说了句“把分析重点改成 select”，界面就直接从卡片选择变成了下拉框——UI 不再是写死的模板，而是能被自然语言持续调整的东西：
 
 <figure>
@@ -56,8 +60,6 @@ Alpha Skill 想做的就是这件事：把一次性的问题解决过程，转�
 
 - **重复的部分 prompt 化**：分析框架、判断逻辑、输出结构这些跨请求不变的东西，沉淀成一份 Skill 的 Prompt。
 - **差异的部分参数化**：股票代码、时间周期、关注的形态类型这些每次都不一样的东西，抽成结构化参数，通过 UI 表单收集，而不是每次都用自然语言重新描述一遍。
-
-![Skill 生成的 prompt.md 与结构化参数文件](/images/alpha-skill/prompt-code.png)
 
 打开生成出来的文件目录能更直观地看到这个“可复用资产”长什么样：一份 `prompt.md` 承载分析框架，`params2ui`、`a2ui` 两个目录各自是独立的 UI 组件，外加一份 `schema.json` 定义参数结构：
 
