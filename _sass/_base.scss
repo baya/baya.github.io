@@ -299,7 +299,9 @@ table {
     font-size: 0.92em;
     border: 1px solid $grey-color-light;
     border-radius: 4px;
-    overflow: hidden;
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 th {
@@ -309,11 +311,18 @@ th {
     background-color: rgba($grey-color-dark, 0.06);
     border-bottom: 1px solid $grey-color-light;
     padding: 8px 12px;
+    overflow-wrap: break-word;
 }
 
 td {
     border-top: 1px solid rgba($grey-color-light, 0.6);
     padding: 8px 12px;
+    overflow-wrap: break-word;
+}
+
+.post-content {
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 tr:nth-child(even) td {
