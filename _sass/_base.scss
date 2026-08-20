@@ -168,6 +168,7 @@ blockquote {
     background: rgba($brand-color, 0.05);
     padding: $spacing-unit * 0.35 $spacing-unit * 0.6;
     font-size: 0.96em;
+    overflow-wrap: break-word;
 
     p {
         margin-bottom: $spacing-unit * 0.35;
@@ -198,6 +199,9 @@ pre {
     line-height: 1.65;
     padding: 20px 22px;
     overflow-x: auto;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    word-break: break-word;
     border-radius: 6px;
     background-color: $ink-code-bg;
     box-shadow: 0 10px 26px -16px rgba(#000, 0.55);
