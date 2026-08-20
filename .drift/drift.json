@@ -1,0 +1,128 @@
+{
+  "version": 1,
+  "objective": "修复 /2017/05/11/7daystalk.html 中 block（代码块/引用块）内容仍出现横向滚动条、需左右滚动才能看全的问题",
+  "workspace": "/Users/whoislcj/workspace/baya.github.io",
+  "createdAt": "2026-08-20T09:52:12.995Z",
+  "updatedAt": "2026-08-20T10:02:08.822Z",
+  "epoch": 1,
+  "stage": "done",
+  "done": true,
+  "artifacts": [
+    {
+      "epoch": 1,
+      "kind": "rfc",
+      "viewKey": null,
+      "slug": null,
+      "path": "rfc/0001-rfc-1.md",
+      "at": "2026-08-20T09:52:27.046Z"
+    },
+    {
+      "epoch": 1,
+      "kind": "adr",
+      "viewKey": null,
+      "slug": null,
+      "path": "adr/0001-adr-1.md",
+      "at": "2026-08-20T09:57:36.325Z"
+    },
+    {
+      "epoch": 1,
+      "kind": "spec",
+      "viewKey": null,
+      "slug": null,
+      "path": "spec/0001-spec-1.md",
+      "at": "2026-08-20T09:58:00.815Z"
+    },
+    {
+      "epoch": 1,
+      "kind": "human-view",
+      "viewKey": "tech-design",
+      "slug": null,
+      "path": "human-views/tech-design.md",
+      "at": "2026-08-20T09:58:28.349Z"
+    },
+    {
+      "epoch": 1,
+      "kind": "human-view",
+      "viewKey": "test-plan",
+      "slug": null,
+      "path": "human-views/test-plan.md",
+      "at": "2026-08-20T09:58:28.374Z"
+    },
+    {
+      "epoch": 1,
+      "kind": "human-view",
+      "viewKey": "decision-review",
+      "slug": null,
+      "path": "human-views/decision-review.md",
+      "at": "2026-08-20T09:58:28.398Z"
+    },
+    {
+      "epoch": 1,
+      "kind": "human-view",
+      "viewKey": "changelog",
+      "slug": null,
+      "path": "human-views/changelog.md",
+      "at": "2026-08-20T09:58:28.424Z"
+    },
+    {
+      "epoch": 1,
+      "kind": "do",
+      "viewKey": null,
+      "slug": null,
+      "path": "do/0001-do-1.md",
+      "at": "2026-08-20T09:59:10.549Z"
+    },
+    {
+      "epoch": 1,
+      "kind": "verify",
+      "viewKey": null,
+      "slug": null,
+      "path": "verify/0001-verify-1.md",
+      "at": "2026-08-20T10:00:10.293Z"
+    }
+  ],
+  "reviews": [
+    {
+      "epoch": 1,
+      "stage": "rfc",
+      "outcome": "approved",
+      "feedback": "",
+      "at": "2026-08-20T09:57:29.226Z"
+    },
+    {
+      "epoch": 1,
+      "stage": "adr",
+      "outcome": "approved",
+      "feedback": "",
+      "at": "2026-08-20T09:57:52.058Z"
+    },
+    {
+      "epoch": 1,
+      "stage": "spec",
+      "outcome": "approved",
+      "feedback": "",
+      "at": "2026-08-20T09:58:11.846Z"
+    },
+    {
+      "epoch": 1,
+      "stage": "human-views",
+      "outcome": "approved",
+      "feedback": "",
+      "at": "2026-08-20T09:58:49.680Z"
+    },
+    {
+      "epoch": 1,
+      "stage": "do",
+      "outcome": "approved",
+      "feedback": "",
+      "at": "2026-08-20T09:59:48.667Z"
+    },
+    {
+      "epoch": 1,
+      "stage": "verify",
+      "outcome": "done",
+      "feedback": "",
+      "at": "2026-08-20T10:02:08.822Z"
+    }
+  ]
+}
